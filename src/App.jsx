@@ -1,45 +1,55 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import React, { useEffect } from 'react';
+import './index.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home/Home';
+import AppRoutes from './routes/AppRoutes';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchSections } from './thunks/sections';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebase/config';
+import { setUser } from './features/user/userSlice';
+const App = () => {
+  const dispatch = useDispatch();
+  const { isActive } = useSelector((state) => state.user);
 
-function App() {
-  const [count, setCount] = useState(0)
+  useEffect(() => {
+    dispatch(fetchSections());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(setUser());
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   const unsub = onAuthStateChanged(auth, async (user) => {
+  //     if (user) {
+  //       const { uid, email, photoURL, displayName, phoneNumber } = user;
+  //       console.log('onAuthStateChanged, user', uid, ' found!');
+
+  //       const info = {
+  //         uid,
+  //         email,
+  //         photoURL,
+  //         phoneNumber,
+  //       };
+
+  //       console.log(info);
+
+  //       dispatch(setUser(info));
+  //     } else {
+  //     }
+  //   });
+
+  //   return unsub;
+  // }, [dispatch, isActive, onAuthStateChanged]);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.jsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  )
-}
+    <React.Fragment>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </React.Fragment>
+  );
+};
 
-export default App
+export default App;
