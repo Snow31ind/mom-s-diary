@@ -10,13 +10,14 @@ import { auth } from './firebase/config';
 import { setUser } from './features/user/userSlice';
 const App = () => {
   const dispatch = useDispatch();
-  const { isActive } = useSelector((state) => state.user);
 
   useEffect(() => {
+    console.log('Fetching sections at app');
     dispatch(fetchSections());
   }, [dispatch]);
 
   useEffect(() => {
+    console.log('Fetching user at app');
     dispatch(setUser());
   }, [dispatch]);
 

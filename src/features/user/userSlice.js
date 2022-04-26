@@ -2,11 +2,16 @@ import { createSlice } from '@reduxjs/toolkit';
 import { signIn, signOut, signUp } from '../../thunks/user';
 
 const initialState = {
-  isAdmin: false,
+  isAdmin: localStorage.getItem('info')
+    ? JSON.parse(localStorage.getItem('info')).uid ===
+      import.meta.env.VITE_ADMIN_UID
+    : false,
   isActive: false,
   loading: false,
   error: '',
-  info: JSON.parse(localStorage.getItem('info')) || null,
+  info: localStorage.getItem('info')
+    ? JSON.parse(localStorage.getItem('info'))
+    : null,
 };
 
 const userSlice = createSlice({
@@ -24,30 +29,6 @@ const userSlice = createSlice({
     },
   },
   extraReducers: {
-    [signUp.fulfilled]: (state, action) => {
-      const info = action.payload;
-
-      state.isActive = true;
-      state.info = info;
-    },
-
-    [signOut.pending]: (state) => {
-      state.loading = true;
-    },
-    [signOut.fulfilled]: (state) => {
-      const info = null;
-      localStorage.setItem('info', JSON.stringify(info));
-
-      state.isAdmin = false;
-      state.isActive = false;
-      state.info = info;
-    },
-    [signOut.rejected]: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-      state.isActive = false;
-    },
-
     [signIn.pending]: (state) => {
       state.loading = true;
     },
@@ -62,13 +43,48 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = '';
       state.info = info;
-
-      // state = { ...state, isActive: true, loading: false, error: '', info };
     },
     [signIn.rejected]: (state, action) => {
       state.isActive = false;
       state.loading = false;
       state.error = action.payload;
+    },
+
+    [signUp.pending]: (state) => {
+      state.loading = true;
+    },
+    [signUp.fulfilled]: (state, action) => {
+      const info = action.payload;
+
+      localStorage.setItem('info', JSON.stringify(info));
+
+      state.isActive = true;
+      state.info = info;
+      state.loading = false;
+      state.error = '';
+    },
+    [signUp.rejected]: (state, action) => {
+      state.isActive = false;
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    [signOut.pending]: (state) => {
+      state.loading = true;
+    },
+    [signOut.fulfilled]: (state) => {
+      const info = null;
+      localStorage.removeItem('info');
+
+      state.isAdmin = false;
+      state.loading = false;
+      state.isActive = false;
+      state.info = info;
+    },
+    [signOut.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.isActive = false;
     },
   },
 });

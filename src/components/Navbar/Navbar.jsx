@@ -18,8 +18,7 @@ import { useEffect } from 'react';
 import { setUser } from '../../features/user/userSlice';
 
 const Navbar = () => {
-  const { info } = useSelector((state) => state.user);
-
+  const { info, isAdmin } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -49,7 +48,11 @@ const Navbar = () => {
           <GrowthBox />
           {!info ? (
             <Button variant="outlined" onClick={signInHandler} color="inherit">
-              Admin
+              LOGIN
+            </Button>
+          ) : isAdmin ? (
+            <Button variant="outlined" onClick={signOutHandler} color="inherit">
+              ADMIN SIGN OUT
             </Button>
           ) : (
             <Button variant="outlined" onClick={signOutHandler} color="inherit">
@@ -71,8 +74,6 @@ const Navbar = () => {
             border: '2px solid #000',
             boxShadow: 24,
             p: 4,
-            display: 'flex',
-            flexDirection: 'column',
           }}
         >
           <LoginForm closeLoginModalHandler={closeLoginModalHandler} />

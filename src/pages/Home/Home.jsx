@@ -9,16 +9,35 @@ import PostForm from '../../components/PostForm/PostForm';
 import SectionForm from '../../components/SectionForm/SectionForm';
 
 const Home = () => {
+  const { isAdmin } = useSelector((state) => state.user);
+  // const dispatch = useDispatch();
+  // const { sections } = useSelector((state) => state.sections);
+
+  // useEffect(() => {
+  //   if (!sections.length) {
+  //     console.log('Fetching sections at homepage');
+  //     dispatch(fetchSections());
+  //   }
+  // }, [dispatch, sections]);
+
   return (
     <Layout>
       <Typography>Home</Typography>
       <Box>
-        <Typography>Create post</Typography>
-        <PostForm />
+        {isAdmin && (
+          <>
+            <Typography>Create post</Typography>
+            <PostForm />
+          </>
+        )}
       </Box>
       <Box>
-        <Typography>Create section</Typography>
-        <SectionForm />
+        {isAdmin && (
+          <>
+            <Typography>Create section</Typography>
+            <SectionForm />
+          </>
+        )}
       </Box>
       <Sections />
     </Layout>

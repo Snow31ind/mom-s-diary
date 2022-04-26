@@ -40,15 +40,22 @@ const PostForm = () => {
       reader.onerror = (error) => reject(error);
     });
 
-  const submitHandler = async ({ name, desc, content, type, photo }) => {
+  const submitHandler = async ({ name, desc, content, sectionId, photo }) => {
     // console.log({ name, desc, content, type, image });
-    const data = { name, desc, content, photo: photo[0] || defaultImage, type };
+    const data = {
+      name,
+      desc,
+      content,
+      photo: photo[0] || defaultImage,
+      sectionId,
+    };
+    // console.log(data);
     dispatch(createPost({ data }));
 
     setValue('name', '');
     setValue('desc', '');
     setValue('content', '');
-    setValue('type', '');
+    setValue('sectionId', '');
     setValue('image', '');
   };
 
@@ -63,7 +70,7 @@ const PostForm = () => {
         {/* Type */}
         <ListItem>
           <Controller
-            name="type"
+            name="sectionId"
             control={control}
             defaultValue={''}
             render={({ field }) => (

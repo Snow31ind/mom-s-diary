@@ -16,10 +16,15 @@ import {
   setDoc,
   Timestamp,
   limit,
+  where,
+  getDoc,
+  Firestore,
 } from 'firebase/firestore';
 import { postConverter } from '../utils/dataTypes/Post';
 import { sectionConverter } from '../utils/dataTypes/Section';
 import { auth, db } from './config';
+import * as firestore from 'firebase/firestore';
+import { slugify } from '../utils/helpers';
 
 export const fetchPostsByType = async (type) => {
   const querySnapshot = await getDocs(
@@ -36,6 +41,7 @@ export const fetchPosts = async () => {
   const postsQuerySnapshop = await getDocs(
     query(collectionGroup(db, 'posts').withConverter(postConverter))
   );
+
   return postsQuerySnapshop.docs.map((post) => {
     // console.log('Post.data():', post.data());
     return {
@@ -56,6 +62,15 @@ export const fetchSectionTitles = async () => {
   }));
 };
 
+export const fetchSectionBySlug = async (slug) => {
+  try {
+    const sections = await fetchSections();
+    return sections.find((section) => slugify(section.title) === slug);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 export const fetchSections = async () => {
   // Query all sections
   const sections = await fetchSectionTitles();
@@ -64,51 +79,63 @@ export const fetchSections = async () => {
 
   return sections.map((section) => ({
     ...section,
-    posts: posts.filter((post) => post.type === section.id),
+    posts: posts.filter((post) => post.sectionId === section.id),
   }));
 };
 
-export const createPost = async (data) => {
-  const docRef = await addDoc(
-    collection(db, 'handbook', data.type, 'posts').withConverter(postConverter),
-    data
+export const createPost = async (post) => {
+  // console.log(data);
+  const postRef = await addDoc(
+    collection(db, 'handbook', post.sectionId, 'posts').withConverter(
+      postConverter
+    ),
+    post
   );
 
-  return { id: docRef.id, ...data };
-};
-
-export const createSection = async (data) => {
-  const { title, titleId } = data;
-  const docRef = await setDoc(
-    doc(db, 'handbook', titleId).withConverter(sectionConverter),
-    { title }
+  const addedPost = await getDoc(
+    doc(db, 'handbook', post.sectionId, 'posts', postRef.id).withConverter(
+      postConverter
+    )
   );
 
-  return { id: docRef.id, ...data };
+  return { id: addedPost.id, ...addedPost.data() };
 };
 
-export const removeSection = async (type) => {
+export const createSection = async (section) => {
+  const sectionRef = await addDoc(
+    collection(db, 'handbook').withConverter(sectionConverter),
+    section
+  );
+
+  const addedSection = await getDoc(
+    doc(db, 'handbook', sectionRef.id).withConverter(sectionConverter)
+  );
+
+  return { id: addedSection.id, ...addedSection.data() };
+};
+
+export const removeSection = async (id) => {
   // Retrieve all posts and delete them.
-  const docRef = await getDocs(collection(db, 'handbook', type, 'posts'));
+  const docRef = await getDocs(collection(db, 'handbook', id, 'posts'));
   const postIds = docRef.docs.map((post) => post.id);
   // console.log(postIds);
-  for (var id of postIds) {
-    await deleteDoc(doc(db, 'handbook', type, 'posts', id));
+  for (var postId of postIds) {
+    await deleteDoc(doc(db, 'handbook', postId, 'posts', id));
   }
 
-  await deleteDoc(doc(db, 'handbook', type));
+  await deleteDoc(doc(db, 'handbook', id));
 };
 
-export const removePost = async (type, id) => {
-  const colRef = collection(db, 'handbook', type, 'posts');
+export const removePost = async (sectionId, id) => {
+  const colRef = collection(db, 'handbook', sectionId, 'posts');
   const querySnapshot = query(colRef, limit(2));
   const posts = await getDocs(querySnapshot);
   console.log(posts.docs.length);
 
-  await deleteDoc(doc(db, 'handbook', type, 'posts', id));
+  await deleteDoc(doc(db, 'handbook', sectionId, 'posts', id));
 
   if (posts.docs.length === 1) {
-    await deleteDoc(doc(db, 'handbook', type));
+    await deleteDoc(doc(db, 'handbook', sectionId));
   }
 };
 
@@ -136,11 +163,11 @@ export const signUp = async (user) => {
       user.email,
       user.password
     );
-    console.log('userCredential:', userCredential);
 
-    const userInfo = userCredential.user;
-    console.log(userInfo);
-    return userInfo;
+    const { uid, email, phoneNumber, photoURL, displayName, emailVerified } =
+      userCredential.user;
+
+    return { uid, email, phoneNumber, photoURL, displayName, emailVerified };
   } catch (error) {
     console.log(error);
     console.log(error.message);

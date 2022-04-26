@@ -10,13 +10,25 @@ export const fetchSections = createAsyncThunk(
   }
 );
 
+export const fetchSectionBySlug = createAsyncThunk(
+  'section/postSectionById',
+  async (params, thunkAPI) => {
+    const { sectionSlug } = params;
+
+    const section = await api.fetchSectionBySlug(sectionSlug);
+    console.log(section);
+
+    return section;
+  }
+);
+
 export const createPost = createAsyncThunk(
   '/handbook/posts/create',
   async (params, thunkAPI) => {
     const { data } = params;
-
+    // console.log(data);
     const post = await api.createPost(data);
-    // console.log(post);
+    console.log(post);
 
     return post;
   }
@@ -25,13 +37,13 @@ export const createPost = createAsyncThunk(
 export const removePost = createAsyncThunk(
   '/handbook/posts/remove',
   async (params, thunkAPI) => {
-    const { type, id } = params;
+    const { sectionId, id } = params;
 
-    console.log(type, id);
+    // console.log(type, id);
 
-    await api.removePost(type, id);
+    await api.removePost(sectionId, id);
 
-    return { type, id };
+    return { sectionId, id };
   }
 );
 
@@ -42,6 +54,8 @@ export const createSection = createAsyncThunk(
 
     const section = await api.createSection(data);
 
+    console.log(section);
+
     return section;
   }
 );
@@ -49,12 +63,12 @@ export const createSection = createAsyncThunk(
 export const removeSection = createAsyncThunk(
   'handbook/section/remove',
   async (params, thunkAPI) => {
-    const { type } = params;
-    console.log(type);
+    const { id } = params;
+    // console.log(id);
 
     try {
-      await api.removeSection(type);
-      return type;
+      await api.removeSection(id);
+      return id;
     } catch (error) {
       console.log(error);
     }

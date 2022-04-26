@@ -13,13 +13,11 @@ const SectionForm = () => {
   } = useForm();
   const dispatch = useDispatch();
 
-  const submitHandler = ({ title, titleId }) => {
-    const data = { title, titleId };
-
+  const submitHandler = ({ title }) => {
+    const data = { title };
     dispatch(createSection({ data }));
 
     setValue('title', '');
-    setValue('titleId', '');
   };
 
   return (
@@ -44,35 +42,6 @@ const SectionForm = () => {
                 helperText={
                   errors.title
                     ? errors.title.type === 'minLength'
-                      ? 'Title is invalid'
-                      : 'Title is required'
-                    : ''
-                }
-                {...field}
-              />
-            )}
-          />
-        </ListItem>
-
-        <ListItem>
-          <Controller
-            name="titleId"
-            control={control}
-            defaultValue={''}
-            rules={{
-              minLength: 1,
-            }}
-            render={({ field }) => (
-              <TextField
-                autoFocus
-                fullWidth
-                variant="outlined"
-                label="Title ID"
-                inputProps={{ type: 'text' }}
-                error={Boolean(errors.titleId)}
-                helperText={
-                  errors.titleId
-                    ? errors.titleId.type === 'minLength'
                       ? 'Title is invalid'
                       : 'Title is required'
                     : ''

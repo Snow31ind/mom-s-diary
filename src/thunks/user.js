@@ -29,7 +29,9 @@ export const signUp = createAsyncThunk(
     console.log(user);
 
     try {
-      await api.signUp(user);
+      const newUser = await api.signUp(user);
+
+      return newUser;
     } catch (error) {
       console.log(error);
       console.log(error.message);

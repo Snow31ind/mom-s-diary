@@ -5,10 +5,13 @@ import {
   createSection,
   removePost,
   removeSection,
+  fetchSectionBySlug,
 } from '../../thunks/sections';
 
 const initialState = {
   sections: [],
+  section: null,
+  post: null,
   loading: false,
   error: '',
   status: 'idle',
@@ -19,15 +22,40 @@ const sectionsSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: {
+    [fetchSections.pending]: (state, action) => {
+      state.loading = true;
+    },
     [fetchSections.fulfilled]: (state, action) => {
       state.sections = action.payload;
-      state.status = 'success';
+      state.loading = false;
+      // state.status = 'success';
+    },
+    [fetchSections.rejected]: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
+    },
+
+    // [fetchSectionBySlug.pending]: (state) => {
+    //   state.loading = true;
+    // },
+    // [fetchSectionBySlug.fulfilled]: (state, action) => {
+    //   state.section = action.payload;
+    //   state.sections = [...state.sections, action.payload];
+    //   state.loading = false;
+    // },
+    // [fetchSectionBySlug.rejected]: (state, action) => {
+    //   state.error = action.payload;
+    //   state.loading = false;
+    // },
+
+    [createPost.pending]: (state) => {
+      state.loading = true;
     },
     [createPost.fulfilled]: (state, action) => {
       const post = action.payload;
 
       const correspondingSection = state.sections.find(
-        (section) => section.id === post.type
+        (section) => section.id === post.sectionId
       );
 
       const newSection = {
@@ -36,22 +64,37 @@ const sectionsSlice = createSlice({
       };
 
       state.sections = state.sections.map((section) =>
-        section.id !== post.type ? section : newSection
+        section.id !== post.sectionId ? section : newSection
       );
     },
-
-    [createSection.fulfilled]: (state, action) => {
-      const section = action.payload;
-
-      state.sections = [...state.sections, section];
+    [createPost.rejected]: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
     },
 
+    [createSection.pending]: (state) => {
+      state.loading = true;
+    },
+    [createSection.fulfilled]: (state, action) => {
+      const section = action.payload;
+      const newSection = { ...section, posts: [] };
+
+      state.sections = [...state.sections, newSection];
+    },
+    [createSection.rejected]: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
+    },
+
+    [removePost.pending]: (state) => {
+      state.loading = true;
+    },
     [removePost.fulfilled]: (state, action) => {
-      const { type, id } = action.payload;
-      console.log(type, id);
+      const { sectionId, id } = action.payload;
+      // console.log(sectionId, id);
 
       const correspondingSection = state.sections.find(
-        (section) => section.id === type
+        (section) => section.id === sectionId
       );
 
       if (correspondingSection.posts.length > 1) {
@@ -63,18 +106,29 @@ const sectionsSlice = createSlice({
         // console.log(newSection);
 
         state.sections = state.sections.map((section) =>
-          section.id !== type ? section : newSection
+          section.id !== sectionId ? section : newSection
         );
       } else {
         state.sections = state.sections.filter(
-          (section) => section.id !== type
+          (section) => section.id !== sectionId
         );
       }
     },
+    [removePost.rejected]: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
+    },
 
+    [removeSection.pending]: (state) => {
+      state.loading = true;
+    },
     [removeSection.fulfilled]: (state, action) => {
-      const type = action.payload;
-      state.sections = state.sections.filter((section) => section.id !== type);
+      const id = action.payload;
+      state.sections = state.sections.filter((section) => section.id !== id);
+    },
+    [removeSection.rejected]: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
     },
   },
 });

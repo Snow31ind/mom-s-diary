@@ -12,18 +12,19 @@ import { Edit, Delete } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { removePost } from '../../thunks/sections';
 import { useNavigate } from 'react-router-dom';
+import { slugify } from '../../utils/helpers';
 
-const PostListItem = ({ post }) => {
+const PostListItem = ({ post, sectionTitle }) => {
   const { isAdmin } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const viewHandler = (id) => {
-    navigate(`/${post.type}/${post.id}`);
+    navigate(`/${slugify(sectionTitle)}/${slugify(post.name)}`);
   };
 
-  const removeHandler = (type, id) => {
-    dispatch(removePost({ type, id }));
+  const removeHandler = (sectionId, id) => {
+    dispatch(removePost({ sectionId, id }));
   };
 
   const editHandler = () => {};
@@ -46,7 +47,7 @@ const PostListItem = ({ post }) => {
         <CardActions>
           <IconButton
             color="warning"
-            onClick={() => removeHandler(post.type, post.id)}
+            onClick={() => removeHandler(post.sectionId, post.id)}
           >
             <Delete />
           </IconButton>

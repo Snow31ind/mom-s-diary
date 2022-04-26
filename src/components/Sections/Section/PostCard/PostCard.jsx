@@ -17,23 +17,24 @@ import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { removePost } from '../../../../thunks/sections';
+import { slugify } from '../../../../utils/helpers';
 
-const PostCard = ({ post, clickHandler }) => {
-  const { type, content, photo, desc, name, createdAt, updatedAt } = post;
+const PostCard = ({ post, clickHandler, type }) => {
+  const { sectionId, content, photo, desc, name, createdAt, updatedAt } = post;
   const createdTime = new Date(createdAt).toLocaleString();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAdmin } = useSelector((state) => state.user);
 
-  const removeHandler = (type, id) => {
-    dispatch(removePost({ type, id }));
+  const removeHandler = (sectionId, id) => {
+    dispatch(removePost({ sectionId, id }));
   };
 
   const editHandler = () => {};
 
-  const viewHandler = () => {
-    navigate(`/${post.type}/${post.id}`);
+  const viewHandler = (post) => {
+    navigate(`/${slugify(type)}/${slugify(post.name)}`);
   };
 
   return (
@@ -42,7 +43,7 @@ const PostCard = ({ post, clickHandler }) => {
       elevation={2}
       sx={{ height: '100%', borderRadius: 0 }}
     >
-      <CardActionArea onClick={() => viewHandler(post.id)}>
+      <CardActionArea onClick={() => viewHandler(post)}>
         <CardMedia
           component="img"
           src={photo}
@@ -63,7 +64,7 @@ const PostCard = ({ post, clickHandler }) => {
         <CardActions>
           <IconButton
             color="warning"
-            onClick={() => removeHandler(post.type, post.id)}
+            onClick={() => removeHandler(post.sectionId, post.id)}
           >
             <Delete />
           </IconButton>
