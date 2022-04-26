@@ -36,6 +36,8 @@ const PostDetail = () => {
   //   }
   // }, [dispatch, sections]);
 
+  console.log('x');
+
   if (!sections.length) {
     return <div>Loading</div>;
   }
