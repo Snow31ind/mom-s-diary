@@ -18,23 +18,30 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { removePost } from '../../../../thunks/sections';
 import { slugify } from '../../../../utils/helpers';
+import GrowthBox from '../../../GrowthBox/GrowthBox';
+import SquareIconButton from '../../../Styled/SquareIconButton';
+import moment from 'moment';
+import { setPost } from '../../../../features/sections/sectionsSlice';
 
-const PostCard = ({ post, clickHandler, type }) => {
-  const { sectionId, content, photo, desc, name, createdAt, updatedAt } = post;
-  const createdTime = new Date(createdAt).toLocaleString();
-
+const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAdmin } = useSelector((state) => state.user);
+
+  const { sectionId, content, photo, desc, name, createdAt, updatedAt } = post;
+  const createdTime = new Date(createdAt).toLocaleString();
 
   const removeHandler = (sectionId, id) => {
     dispatch(removePost({ sectionId, id }));
   };
 
-  const editHandler = () => {};
+  const editHandler = () => {
+    dispatch(setPost(post));
+    openPostFormModalHandler();
+  };
 
   const viewHandler = (post) => {
-    navigate(`/${slugify(type)}/${slugify(post.name)}`);
+    navigate(`/handbook/${slugify(type)}/${slugify(post.name)}`);
   };
 
   return (
@@ -52,7 +59,9 @@ const PostCard = ({ post, clickHandler, type }) => {
         />
       </CardActionArea>
 
-      <CardHeader title={<Typography>{createdTime}</Typography>} />
+      <CardHeader
+        title={<Typography>{`${moment(createdAt).fromNow()}`}</Typography>}
+      />
       <CardContent>
         <Typography variant="h5">{name}</Typography>
         <Typography variant="h6">{desc}</Typography>
@@ -60,18 +69,31 @@ const PostCard = ({ post, clickHandler, type }) => {
         {/* <Typography>{new Date(createdAt).toISOString()}</Typography> */}
       </CardContent>
 
+      {/* Admin tools */}
       {isAdmin && (
-        <CardActions>
-          <IconButton
-            color="warning"
+        <CardActions
+          sx={{
+            display: 'flex',
+          }}
+        >
+          <GrowthBox />
+          <SquareIconButton
+            variant="contained"
+            size="small"
+            color="inherit"
             onClick={() => removeHandler(post.sectionId, post.id)}
           >
             <Delete />
-          </IconButton>
+          </SquareIconButton>
 
-          <IconButton color="primary" onClick={editHandler}>
+          <SquareIconButton
+            variant="contained"
+            size="small"
+            color="inherit"
+            onClick={editHandler}
+          >
             <Edit />
-          </IconButton>
+          </SquareIconButton>
         </CardActions>
       )}
     </Card>

@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import * as api from '../firebase/services';
 
 export const fetchSections = createAsyncThunk(
-  '/handbook',
+  '/section/fetchSections',
   async (params, thunkAPI) => {
     const sections = await api.fetchSections();
 
@@ -23,7 +23,7 @@ export const fetchSectionBySlug = createAsyncThunk(
 );
 
 export const createPost = createAsyncThunk(
-  '/handbook/posts/create',
+  '/posts/createPost',
   async (params, thunkAPI) => {
     const { data } = params;
     // console.log(data);
@@ -35,7 +35,7 @@ export const createPost = createAsyncThunk(
 );
 
 export const removePost = createAsyncThunk(
-  '/handbook/posts/remove',
+  '/post/removePost',
   async (params, thunkAPI) => {
     const { sectionId, id } = params;
 
@@ -47,21 +47,33 @@ export const removePost = createAsyncThunk(
   }
 );
 
-export const createSection = createAsyncThunk(
-  '/handbook/section/create',
+export const updatePostById = createAsyncThunk(
+  '/post/update',
   async (params, thunkAPI) => {
-    const { data } = params;
+    const { data, id } = params;
+    console.log(data, id);
 
-    const section = await api.createSection(data);
+    const updatedPost = await api.updatePostById(id, data);
+    console.log(updatedPost);
 
-    console.log(section);
+    return updatedPost;
+  }
+);
 
-    return section;
+export const createSection = createAsyncThunk(
+  '/section/createSection',
+  async (params, thunkAPI) => {
+    const { section, post } = params;
+    console.log(section, post);
+
+    const createdSection = await api.createSection(section, post);
+
+    return createdSection;
   }
 );
 
 export const removeSection = createAsyncThunk(
-  'handbook/section/remove',
+  '/section/removeSection',
   async (params, thunkAPI) => {
     const { id } = params;
     // console.log(id);

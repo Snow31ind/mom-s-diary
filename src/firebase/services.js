@@ -7,7 +7,6 @@ import {
   addDoc,
   collection,
   collectionGroup,
-  connectFirestoreEmulator,
   deleteDoc,
   doc,
   getDocs,
@@ -19,12 +18,15 @@ import {
   where,
   getDoc,
   Firestore,
+  orderBy,
+  updateDoc,
 } from 'firebase/firestore';
 import { postConverter } from '../utils/dataTypes/Post';
 import { sectionConverter } from '../utils/dataTypes/Section';
 import { auth, db } from './config';
 import * as firestore from 'firebase/firestore';
 import { slugify } from '../utils/helpers';
+import { RepeatOneSharp } from '@mui/icons-material';
 
 export const fetchPostsByType = async (type) => {
   const querySnapshot = await getDocs(
@@ -53,7 +55,10 @@ export const fetchPosts = async () => {
 
 export const fetchSectionTitles = async () => {
   const querySnapshot = await getDocs(
-    collection(db, 'handbook').withConverter(sectionConverter)
+    query(
+      collection(db, 'handbook').withConverter(sectionConverter),
+      orderBy('title', 'asc')
+    )
   );
 
   return querySnapshot.docs.map((doc) => ({
@@ -101,17 +106,70 @@ export const createPost = async (post) => {
   return { id: addedPost.id, ...addedPost.data() };
 };
 
-export const createSection = async (section) => {
-  const sectionRef = await addDoc(
-    collection(db, 'handbook').withConverter(sectionConverter),
-    section
-  );
+export const updatePostById = async (id, post) => {
+  try {
+    console.log(post);
 
-  const addedSection = await getDoc(
-    doc(db, 'handbook', sectionRef.id).withConverter(sectionConverter)
-  );
+    const docRef = doc(
+      db,
+      'handbook',
+      post.sectionId,
+      'posts',
+      id
+    ).withConverter(postConverter);
 
-  return { id: addedSection.id, ...addedSection.data() };
+    await updateDoc(docRef, { ...post, updatedAt: serverTimestamp() });
+
+    const updatedPost = await getDoc(docRef);
+
+    return { id: updatedPost.id, ...updatedPost.data() };
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+export const createSection = async (section, post) => {
+  try {
+    const sectionRef = await addDoc(
+      collection(db, 'handbook').withConverter(sectionConverter),
+      section
+    );
+
+    const addedSection = await getDoc(
+      doc(db, 'handbook', sectionRef.id).withConverter(sectionConverter)
+    );
+
+    console.log('X');
+
+    const postRef = await addDoc(
+      collection(db, 'handbook', sectionRef.id, 'posts').withConverter(
+        postConverter
+      ),
+      { ...post, sectionId: sectionRef.id }
+    );
+
+    console.log('Y');
+
+    const addedPost = await getDoc(
+      doc(db, 'handbook', sectionRef.id, 'posts', postRef.id).withConverter(
+        postConverter
+      )
+    );
+
+    console.log('Z');
+
+    const newSection = {
+      id: addedSection.id,
+      ...addedSection.data(),
+      posts: [{ id: addedPost.id, ...addedPost.data() }],
+    };
+
+    console.log(newSection);
+
+    return newSection;
+  } catch (error) {
+    console.log(error.message);
+  }
 };
 
 export const removeSection = async (id) => {

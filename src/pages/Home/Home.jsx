@@ -7,6 +7,8 @@ import { fetchSections } from '../../thunks/sections';
 import Sections from '../../components/Sections/Sections';
 import PostForm from '../../components/PostForm/PostForm';
 import SectionForm from '../../components/SectionForm/SectionForm';
+import LoadingPostCard from '../../components/Loading/LoadingPostCard';
+import LoadingSection from '../../components/Loading/LoadingSection';
 
 const Home = () => {
   const { isAdmin } = useSelector((state) => state.user);
@@ -22,23 +24,7 @@ const Home = () => {
 
   return (
     <Layout>
-      <Typography>Home</Typography>
-      <Box>
-        {isAdmin && (
-          <>
-            <Typography>Create post</Typography>
-            <PostForm />
-          </>
-        )}
-      </Box>
-      <Box>
-        {isAdmin && (
-          <>
-            <Typography>Create section</Typography>
-            <SectionForm />
-          </>
-        )}
-      </Box>
+      {/* <LoadingSection /> */}
       <Sections />
     </Layout>
   );

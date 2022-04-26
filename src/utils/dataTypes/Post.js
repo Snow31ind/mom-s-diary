@@ -20,7 +20,9 @@ export const postConverter = {
       name: post.name,
       photo: post.photo,
       sectionId: post.sectionId,
-      createdAt: serverTimestamp(),
+      createdAt: post.hasOwnProperty('createdAt')
+        ? post.createdAt
+        : serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
   },

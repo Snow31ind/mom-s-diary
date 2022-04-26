@@ -15,11 +15,11 @@ const routes = [
     caseSensitive: true,
   },
   {
-    path: '/:sectionSlug',
+    path: '/handbook/:sectionSlug',
     element: <SectionDetail />,
   },
   {
-    path: '/:sectionSlug/:postSlug',
+    path: '/handbook/:sectionSlug/:postSlug',
     element: <PostDetail />,
   },
 ];

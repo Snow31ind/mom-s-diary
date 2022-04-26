@@ -1,17 +1,76 @@
-import { Box, Typography } from '@mui/material';
-import React from 'react';
+import { Add } from '@mui/icons-material';
+import { Box, Modal, Stack, Typography } from '@mui/material';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import GrowthBox from '../GrowthBox/GrowthBox';
+import LoadingSection from '../Loading/LoadingSection';
+import SectionForm from '../SectionForm/SectionForm';
+import SquareIconButton from '../Styled/SquareIconButton';
 import Section from './Section/Section';
 
 const Sections = () => {
-  const { sections } = useSelector((state) => state.sections);
+  const { sections, loading } = useSelector((state) => state.sections);
+  const { isAdmin } = useSelector((state) => state.user);
+  const [openSectionForm, setOpenSectionForm] = useState(false);
+
+  useEffect(() => {
+    console.log('Rerendering component Sections');
+  }, []);
 
   return (
-    <Box sx={{}}>
-      {sections.map((section) => (
-        <Section key={section.title} section={section} />
-      ))}
-    </Box>
+    <>
+      <Box>
+        {isAdmin && (
+          <Stack direction="row">
+            <GrowthBox />
+            <SquareIconButton
+              variant="contained"
+              size="small"
+              color="inherit"
+              onClick={() => setOpenSectionForm(true)}
+            >
+              <Add />
+            </SquareIconButton>
+          </Stack>
+        )}
+        {loading ? (
+          <>
+            {/* Loading Posts */}
+            {Array(1, 2, 3).map((e) => (
+              <LoadingSection key={e} />
+            ))}
+          </>
+        ) : (
+          <>
+            {/* Posts loaded */}
+            {sections.map((section) => (
+              <Section key={section.title} section={section} />
+            ))}
+          </>
+        )}
+      </Box>
+
+      <Modal open={openSectionForm} onClose={() => setOpenSectionForm(false)}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            border: '2px solid #000',
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <SectionForm
+            closeSectionFormModalHandler={() => setOpenSectionForm(false)}
+          />
+        </Box>
+      </Modal>
+    </>
   );
 };
 

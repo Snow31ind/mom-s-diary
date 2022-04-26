@@ -6,6 +6,7 @@ import {
   removePost,
   removeSection,
   fetchSectionBySlug,
+  updatePostById,
 } from '../../thunks/sections';
 
 const initialState = {
@@ -20,9 +21,22 @@ const initialState = {
 const sectionsSlice = createSlice({
   name: 'sections',
   initialState,
-  reducers: {},
+  reducers: {
+    setPost: (state, action) => {
+      state.post = action.payload;
+    },
+    clearPost: (state) => {
+      state.post = null;
+    },
+    setSection: (state, action) => {
+      state.section = action.payload;
+    },
+    clearSection: (state) => {
+      state.section = null;
+    },
+  },
   extraReducers: {
-    [fetchSections.pending]: (state, action) => {
+    [fetchSections.pending]: (state) => {
       state.loading = true;
     },
     [fetchSections.fulfilled]: (state, action) => {
@@ -66,8 +80,38 @@ const sectionsSlice = createSlice({
       state.sections = state.sections.map((section) =>
         section.id !== post.sectionId ? section : newSection
       );
+
+      state.loading = false;
     },
     [createPost.rejected]: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
+    },
+
+    [updatePostById.pending]: (state) => {
+      state.loading = true;
+    },
+    [updatePostById.fulfilled]: (state, action) => {
+      state.loading = false;
+
+      const updatedPost = action.payload;
+
+      const correspondingSection = state.sections.find(
+        (section) => section.id === updatedPost.sectionId
+      );
+
+      const updatedSection = {
+        ...correspondingSection,
+        posts: correspondingSection.posts.map((post) =>
+          post.id !== updatedPost.id ? post : updatedPost
+        ),
+      };
+
+      state.sections = state.sections.map((section) =>
+        section.id !== updatedSection.id ? section : updatedSection
+      );
+    },
+    [updatePostById.rejected]: (state, action) => {
       state.error = action.payload;
       state.loading = false;
     },
@@ -77,9 +121,9 @@ const sectionsSlice = createSlice({
     },
     [createSection.fulfilled]: (state, action) => {
       const section = action.payload;
-      const newSection = { ...section, posts: [] };
 
-      state.sections = [...state.sections, newSection];
+      state.loading = false;
+      state.sections = [...state.sections, section];
     },
     [createSection.rejected]: (state, action) => {
       state.error = action.payload;
@@ -124,6 +168,7 @@ const sectionsSlice = createSlice({
     },
     [removeSection.fulfilled]: (state, action) => {
       const id = action.payload;
+      state.loading = false;
       state.sections = state.sections.filter((section) => section.id !== id);
     },
     [removeSection.rejected]: (state, action) => {
@@ -132,5 +177,8 @@ const sectionsSlice = createSlice({
     },
   },
 });
+
+export const { setPost, setSection, clearPost, clearSection } =
+  sectionsSlice.actions;
 
 export default sectionsSlice.reducer;

@@ -54,7 +54,6 @@ const LoginForm = ({ closeLoginModalHandler }) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        // flex: 1,
       }}
     >
       <Box
@@ -169,7 +168,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
           <ListItem>
             {!loading ? (
               <Button fullWidth type="submit" variant="contained">
-                {isSignIn ? 'SIGN IN' : 'SING UP'}
+                {isSignIn ? 'SIGN IN' : 'SIGN UP'}
               </Button>
             ) : (
               <Button fullWidth variant="contained">

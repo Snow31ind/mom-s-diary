@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  CircularProgress,
   FormControl,
   InputLabel,
   List,
@@ -7,18 +9,22 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { createPost } from '../../thunks/sections';
+import { createPost, updatePostById } from '../../thunks/sections';
+import GrowthBox from '../GrowthBox/GrowthBox';
 import defaultImage from '/images/memories.png';
 
-const PostForm = () => {
+const PostForm = ({ closePostFormModalHandler }) => {
   const dispatch = useDispatch();
-  const { sections } = useSelector((state) => state.sections);
-  const { isAdmin } = useSelector((state) => state.user);
+  const { sections, loading, post, section } = useSelector(
+    (state) => state.sections
+  );
+
   const types = sections.map((section) => ({
     label: section.title,
     value: section.id,
@@ -32,16 +38,21 @@ const PostForm = () => {
     setValue,
   } = useForm();
 
-  const toBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
+  const isEditingPost = Boolean(post);
+  const isCreatingPost = Boolean(section);
+
+  useEffect(() => {
+    if (isEditingPost) {
+      // Set the default value for the form if the post in the storage management exists
+      setValue('name', post.name);
+      setValue('desc', post.desc);
+      setValue('content', post.content);
+      // setValue('photo', post.photo);
+      setValue('sectionId', post.sectionId);
+    }
+  }, [post]);
 
   const submitHandler = async ({ name, desc, content, sectionId, photo }) => {
-    // console.log({ name, desc, content, type, image });
     const data = {
       name,
       desc,
@@ -50,153 +61,202 @@ const PostForm = () => {
       sectionId,
     };
     // console.log(data);
-    dispatch(createPost({ data }));
 
+    if (isEditingPost) {
+      // Update post if the post in the storage management exists.
+      console.log(data);
+      dispatch(updatePostById({ data, id: post.id }));
+    } else {
+      // Else we would create a new post
+      dispatch(createPost({ data }));
+    }
+
+    closePostFormModalHandler();
+
+    clearHandler();
+  };
+
+  const clearHandler = () => {
     setValue('name', '');
     setValue('desc', '');
     setValue('content', '');
-    setValue('sectionId', '');
-    setValue('image', '');
+    setValue('photo', '');
+
+    if (!isCreatingPost) {
+      setValue('sectionId', '');
+    }
   };
 
-  const uploadImageHandler = (e) => {
-    const fileReader = new FileReader();
-    console.log(e.target.files[0]);
+  const resetHandler = () => {
+    if (post) {
+      setValue('name', post.name);
+      setValue('desc', post.desc);
+      setValue('content', post.content);
+      // setValue('photo', post.photo);
+      setValue('sectionId', post.sectionId);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit(submitHandler)}>
-      <List>
-        {/* Type */}
-        <ListItem>
-          <Controller
-            name="sectionId"
-            control={control}
-            defaultValue={''}
-            render={({ field }) => (
-              <FormControl variant="filled" sx={{ width: 120 }}>
-                <InputLabel id="select-type">Type</InputLabel>
-                <Select labelId="select-type" label="Type" {...field}>
-                  {types.map((type) => (
-                    <MenuItem key={type.value} value={type.value}>
-                      {type.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-          />
-        </ListItem>
-        {/* Name */}
-        <ListItem>
-          <Controller
-            name="name"
-            control={control}
-            defaultValue={''}
-            rules={{
-              required: true,
-              minLength: 1,
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Typography textAlign="center" variant="h6" fontWeight="500">
+        {isEditingPost && 'Updating Post'}
+        {isCreatingPost && 'Creating New Post'}
+      </Typography>
+
+      <form onSubmit={handleSubmit(submitHandler)}>
+        <List>
+          {/* Section Title */}
+          <ListItem>
+            <Controller
+              name="sectionId"
+              control={control}
+              defaultValue={section ? section.id : post ? post.sectionId : ''}
+              render={({ field }) => (
+                <FormControl fullWidth variant="filled">
+                  <InputLabel id="select-type">Section title</InputLabel>
+                  <Select
+                    disabled={isCreatingPost || isEditingPost ? true : false}
+                    labelId="select-type"
+                    label="Type"
+                    {...field}
+                  >
+                    {types.map((type) => (
+                      <MenuItem key={type.value} value={type.value}>
+                        {type.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            />
+          </ListItem>
+
+          {/* Name */}
+          <ListItem>
+            <Controller
+              name="name"
+              control={control}
+              defaultValue={post ? post.name : ''}
+              rules={{
+                required: true,
+                minLength: 1,
+              }}
+              render={({ field }) => (
+                <TextField
+                  autoFocus
+                  fullWidth
+                  variant="outlined"
+                  label="Name *"
+                  inputProps={{ type: 'text' }}
+                  error={Boolean(errors.name)}
+                  helperText={
+                    errors.name
+                      ? errors.name.type === 'minLength'
+                        ? 'Name is invalid'
+                        : 'Name is required'
+                      : ''
+                  }
+                  {...field}
+                />
+              )}
+            />
+          </ListItem>
+
+          {/* Description */}
+          <ListItem>
+            <Controller
+              name="desc"
+              control={control}
+              defaultValue={post ? post.desc : ''}
+              rules={{
+                required: true,
+                minLength: 1,
+              }}
+              render={({ field }) => (
+                <TextField
+                  autoFocus
+                  fullWidth
+                  variant="outlined"
+                  label="Description *"
+                  inputProps={{ type: 'text' }}
+                  error={Boolean(errors.desc)}
+                  helperText={
+                    errors.desc
+                      ? errors.desc.type === 'minLength'
+                        ? 'Description is invalid'
+                        : 'Description is required'
+                      : ''
+                  }
+                  {...field}
+                />
+              )}
+            />
+          </ListItem>
+
+          {/* Content */}
+          <ListItem>
+            <Controller
+              name="content"
+              control={control}
+              defaultValue={post ? post.content : ''}
+              rules={{
+                required: true,
+                minLength: 1,
+              }}
+              render={({ field }) => (
+                <TextField
+                  autoFocus
+                  fullWidth
+                  variant="outlined"
+                  label="Content *"
+                  inputProps={{ type: 'text' }}
+                  error={Boolean(errors.desc)}
+                  helperText={
+                    errors.content
+                      ? errors.content.type === 'minLength'
+                        ? 'Content is invalid'
+                        : 'Content is required'
+                      : ''
+                  }
+                  {...field}
+                />
+              )}
+            />
+          </ListItem>
+
+          {/* Image */}
+          <ListItem>
+            <input {...register('photo')} type="file" />
+          </ListItem>
+
+          <ListItem
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
             }}
-            render={({ field }) => (
-              <TextField
-                autoFocus
-                fullWidth
-                variant="outlined"
-                label="Name *"
-                inputProps={{ type: 'text' }}
-                error={Boolean(errors.name)}
-                helperText={
-                  errors.name
-                    ? errors.name.type === 'minLength'
-                      ? 'Name is invalid'
-                      : 'Name is required'
-                    : ''
-                }
-                {...field}
-              />
+          >
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={post ? resetHandler : clearHandler}
+            >
+              {isEditingPost ? 'RESET' : 'CLEAR'}
+            </Button>
+            <GrowthBox />
+            {!loading ? (
+              <Button type="submit" color="success" variant="contained">
+                {isEditingPost ? 'UPDATE' : 'CREATE'}
+              </Button>
+            ) : (
+              <Button variant="contained" disabled>
+                <CircularProgress color="inherit" size={26} />
+              </Button>
             )}
-          />
-        </ListItem>
-
-        {/* Description */}
-        <ListItem>
-          <Controller
-            name="desc"
-            control={control}
-            defaultValue={''}
-            rules={{
-              required: true,
-              minLength: 1,
-            }}
-            render={({ field }) => (
-              <TextField
-                autoFocus
-                fullWidth
-                variant="outlined"
-                label="Description *"
-                inputProps={{ type: 'text' }}
-                error={Boolean(errors.desc)}
-                helperText={
-                  errors.desc
-                    ? errors.desc.type === 'minLength'
-                      ? 'Description is invalid'
-                      : 'Description is required'
-                    : ''
-                }
-                {...field}
-              />
-            )}
-          />
-        </ListItem>
-
-        {/* Content */}
-        <ListItem>
-          <Controller
-            name="content"
-            control={control}
-            defaultValue={''}
-            rules={{
-              required: true,
-              minLength: 1,
-            }}
-            render={({ field }) => (
-              <TextField
-                autoFocus
-                fullWidth
-                variant="outlined"
-                label="Content *"
-                inputProps={{ type: 'text' }}
-                error={Boolean(errors.desc)}
-                helperText={
-                  errors.content
-                    ? errors.content.type === 'minLength'
-                      ? 'Content is invalid'
-                      : 'Content is required'
-                    : ''
-                }
-                {...field}
-              />
-            )}
-          />
-        </ListItem>
-
-        {/* Image */}
-        <ListItem>
-          <input {...register('photo')} type="file" />
-        </ListItem>
-
-        <ListItem
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-          }}
-        >
-          <Button type="submit" variant="contained">
-            CREATE
-          </Button>
-        </ListItem>
-      </List>
-    </form>
+          </ListItem>
+        </List>
+      </form>
+    </Box>
   );
 };
 

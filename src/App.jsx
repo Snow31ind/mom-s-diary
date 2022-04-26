@@ -16,10 +16,10 @@ const App = () => {
     dispatch(fetchSections());
   }, [dispatch]);
 
-  useEffect(() => {
-    console.log('Fetching user at app');
-    dispatch(setUser());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   console.log('Fetching user at app');
+  //   dispatch(setUser());
+  // }, [dispatch]);
 
   // useEffect(() => {
   //   const unsub = onAuthStateChanged(auth, async (user) => {

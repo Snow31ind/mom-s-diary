@@ -47,7 +47,9 @@ const PostDetail = () => {
       <Box>
         <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
           <Link to="/">Home</Link>
-          <Link to={`/${sectionSlug}`}>{correspondingSection.title}</Link>
+          <Link to={`/handbook/${sectionSlug}`}>
+            {correspondingSection.title}
+          </Link>
           <Typography color="black" fontWeight="bold">
             {post.name}
           </Typography>
