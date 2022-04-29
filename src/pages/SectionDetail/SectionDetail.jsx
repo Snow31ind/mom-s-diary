@@ -14,26 +14,15 @@ import PostListItem from '../../components/PostListItem/PostListItem';
 import { slugify } from '../../utils/helpers';
 import { fetchSectionBySlug, fetchSections } from '../../thunks/sections';
 import { NavigateNext } from '@mui/icons-material';
+import { selectSectionBySlug } from '../../features/sections/selector';
 
 const SectionDetail = () => {
   const { sectionSlug } = useParams();
   const dispatch = useDispatch();
-  const { sections } = useSelector((state) => state.sections);
 
-  const section = sections.find(
-    (section) => slugify(section.title) === sectionSlug
-  );
+  const section = useSelector(selectSectionBySlug(sectionSlug));
 
-  // console.log(sectionSlug);
-
-  // useEffect(() => {
-  //   if (!sections.length) {
-  //     console.log(`Fetching section ${sectionSlug} at SectionDetail`);
-  //     dispatch(fetchSections());
-  //   }
-  // }, [dispatch, sections]);
-
-  if (!sections.length) {
+  if (!section) {
     return <div>Loading</div>;
   }
 

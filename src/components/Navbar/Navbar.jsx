@@ -1,8 +1,13 @@
 import {
   AppBar,
+  Avatar,
   Box,
   Button,
+  IconButton,
   Link,
+  ListItemIcon,
+  Menu,
+  MenuItem,
   Modal,
   Toolbar,
   Typography,
@@ -16,13 +21,23 @@ import { signOut } from '../../thunks/user';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { setUser } from '../../features/user/userSlice';
+import { selectInfo, selectIsAdmin } from '../../features/user/selector';
+import { Dashboard, Logout } from '@mui/icons-material';
 
 const Navbar = () => {
-  const { info, isAdmin } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const info = useSelector(selectInfo());
+  const isAdmin = useSelector(selectIsAdmin());
+
   const [loginModal, setLoginModal] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const isMenuOpened = Boolean(anchorEl);
+
+  const openMenuHandler = (e) => setAnchorEl(e.currentTarget);
+  const closeMenuHandler = () => setAnchorEl(null);
 
   const signInHandler = () => {
     setLoginModal(true);
@@ -51,9 +66,58 @@ const Navbar = () => {
               LOGIN
             </Button>
           ) : isAdmin ? (
-            <Button variant="outlined" onClick={signOutHandler} color="inherit">
-              ADMIN SIGN OUT
-            </Button>
+            <>
+              <IconButton onClick={openMenuHandler}>
+                <Avatar>A</Avatar>
+              </IconButton>
+
+              <Menu
+                open={isMenuOpened}
+                anchorEl={anchorEl}
+                onClose={closeMenuHandler}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: 'visible',
+                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                    mt: 1.5,
+                    '& .MuiAvatar-root': {
+                      width: 32,
+                      height: 32,
+                      ml: -0.5,
+                      mr: 1,
+                    },
+                    '&:before': {
+                      content: '""',
+                      display: 'block',
+                      position: 'absolute',
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: 'background.paper',
+                      transform: 'translateY(-50%) rotate(45deg)',
+                      zIndex: 0,
+                    },
+                  },
+                }}
+                transformOrigin
+              >
+                <MenuItem onClick={() => navigate('/admin')}>
+                  <ListItemIcon>
+                    <Dashboard />
+                  </ListItemIcon>
+                  <Typography>Dashboard</Typography>
+                </MenuItem>
+
+                <MenuItem onClick={signOutHandler}>
+                  <ListItemIcon>
+                    <Logout />
+                  </ListItemIcon>
+                  <Typography>Logout</Typography>
+                </MenuItem>
+              </Menu>
+            </>
           ) : (
             <Button variant="outlined" onClick={signOutHandler} color="inherit">
               SIGN OUT

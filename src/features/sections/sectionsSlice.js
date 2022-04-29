@@ -134,6 +134,8 @@ const sectionsSlice = createSlice({
       state.loading = true;
     },
     [removePost.fulfilled]: (state, action) => {
+      state.loading = false;
+
       const { sectionId, id } = action.payload;
       // console.log(sectionId, id);
 

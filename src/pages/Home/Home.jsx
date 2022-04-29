@@ -11,20 +11,8 @@ import LoadingPostCard from '../../components/Loading/LoadingPostCard';
 import LoadingSection from '../../components/Loading/LoadingSection';
 
 const Home = () => {
-  const { isAdmin } = useSelector((state) => state.user);
-  // const dispatch = useDispatch();
-  // const { sections } = useSelector((state) => state.sections);
-
-  // useEffect(() => {
-  //   if (!sections.length) {
-  //     console.log('Fetching sections at homepage');
-  //     dispatch(fetchSections());
-  //   }
-  // }, [dispatch, sections]);
-
   return (
     <Layout>
-      {/* <LoadingSection /> */}
       <Sections />
     </Layout>
   );

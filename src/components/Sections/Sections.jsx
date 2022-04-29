@@ -3,6 +3,11 @@ import { Box, Modal, Stack, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import {
+  selectLoading,
+  selectSections,
+} from '../../features/sections/selector';
+import { selectIsAdmin } from '../../features/user/selector';
 import GrowthBox from '../GrowthBox/GrowthBox';
 import LoadingSection from '../Loading/LoadingSection';
 import SectionForm from '../SectionForm/SectionForm';
@@ -10,8 +15,10 @@ import SquareIconButton from '../Styled/SquareIconButton';
 import Section from './Section/Section';
 
 const Sections = () => {
-  const { sections, loading } = useSelector((state) => state.sections);
-  const { isAdmin } = useSelector((state) => state.user);
+  const sections = useSelector(selectSections());
+  const loading = useSelector(selectLoading());
+  const isAdmin = useSelector(selectIsAdmin());
+
   const [openSectionForm, setOpenSectionForm] = useState(false);
 
   useEffect(() => {

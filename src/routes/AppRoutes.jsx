@@ -3,6 +3,8 @@ import Home from '../pages/Home/Home';
 import SectionDetail from '../pages/SectionDetail/SectionDetail';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import PostDetail from '../pages/PostDetail/PostDetail';
+import Admin from '../pages/Admin/Admin';
+
 const routes = [
   {
     path: '/',
@@ -21,6 +23,14 @@ const routes = [
   {
     path: '/handbook/:sectionSlug/:postSlug',
     element: <PostDetail />,
+  },
+  {
+    path: '/admin',
+    element: <Navigate to="/admin/sections" />,
+  },
+  {
+    path: '/admin/:selectedSection',
+    element: <Admin />,
   },
 ];
 

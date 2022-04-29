@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { signIn, signUp } from '../../thunks/user';
 import { useNavigate } from 'react-router-dom';
 import { red } from '@mui/material/colors';
+import { selectLoading } from '../../features/user/selector';
 
 const LoginForm = ({ closeLoginModalHandler }) => {
   const {
@@ -27,7 +28,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
   const navigate = useNavigate();
   const [isSignIn, setIsSignIn] = useState(true);
 
-  const { loading } = useSelector((state) => state.user);
+  const loading = useSelector(selectLoading());
 
   const submitHandler = ({ email, password, confirmPassword }) => {
     const user = { email, password };

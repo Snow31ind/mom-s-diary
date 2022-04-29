@@ -9,7 +9,7 @@ const Layout = ({ children }) => {
       <Navbar />
       <DrawerHeader />
 
-      <Container>{children}</Container>
+      <Container maxWidth="xl">{children}</Container>
     </Box>
   );
 };

@@ -13,14 +13,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { removePost } from '../../thunks/sections';
 import { useNavigate } from 'react-router-dom';
 import { slugify } from '../../utils/helpers';
+import { selectIsAdmin } from '../../features/user/selector';
 
 const PostListItem = ({ post, sectionTitle }) => {
-  const { isAdmin } = useSelector((state) => state.user);
+  // const { isAdmin } = useSelector((state) => state.user);
+  const isAdmin = useSelector(selectIsAdmin());
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const viewHandler = (id) => {
-    navigate(`/${slugify(sectionTitle)}/${slugify(post.name)}`);
+    navigate(`/handbook/${slugify(sectionTitle)}/${slugify(post.name)}`);
   };
 
   const removeHandler = (sectionId, id) => {

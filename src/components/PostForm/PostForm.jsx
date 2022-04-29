@@ -15,20 +15,25 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectLoading,
+  selectPost,
+  selectSection,
+  selectSections,
+  selectSectionTypes,
+} from '../../features/sections/selector';
 import { createPost, updatePostById } from '../../thunks/sections';
 import GrowthBox from '../GrowthBox/GrowthBox';
 import defaultImage from '/images/memories.png';
 
 const PostForm = ({ closePostFormModalHandler }) => {
   const dispatch = useDispatch();
-  const { sections, loading, post, section } = useSelector(
-    (state) => state.sections
-  );
 
-  const types = sections.map((section) => ({
-    label: section.title,
-    value: section.id,
-  }));
+  const sections = useSelector(selectSections());
+  const loading = useSelector(selectLoading());
+  const post = useSelector(selectPost());
+  const section = useSelector(selectSection());
+  const types = useSelector(selectSectionTypes());
 
   const {
     register,

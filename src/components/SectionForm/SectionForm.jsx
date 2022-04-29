@@ -10,6 +10,7 @@ import {
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { selectLoading } from '../../features/sections/selector';
 import { createSection } from '../../thunks/sections';
 import GrowthBox from '../GrowthBox/GrowthBox';
 import defaultImage from '/images/memories.png';
@@ -23,8 +24,7 @@ const SectionForm = ({ closeSectionFormModalHandler }) => {
     register,
   } = useForm();
   const dispatch = useDispatch();
-
-  const { loading } = useSelector((state) => state.sections);
+  const loading = useSelector(selectLoading());
 
   const submitHandler = ({ title, name, desc, content, photo }) => {
     const section = {

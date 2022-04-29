@@ -15,30 +15,19 @@ import { slugify } from '../../utils/helpers';
 import { useEffect } from 'react';
 import { fetchSections } from '../../thunks/sections';
 import { NavigateNext } from '@mui/icons-material';
+import {
+  selectPostBySlug,
+  selectSectionTitleBySlug,
+} from '../../features/sections/selector';
 
 const PostDetail = () => {
   const dispatch = useDispatch();
-
   const { sectionSlug, postSlug } = useParams();
-  // console.log(sectionSlug, postSlug);
-  const { sections } = useSelector((state) => state.sections);
-  const correspondingSection = sections.find(
-    (section) => slugify(section.title) === sectionSlug
-  );
-  const post = correspondingSection
-    ? correspondingSection.posts.find((post) => slugify(post.name) === postSlug)
-    : null;
 
-  // useEffect(() => {
-  //   if (!sections.length) {
-  //     console.log(`Fetching post ${postSlug} at PostDetail`);
-  //     dispatch(fetchSections());
-  //   }
-  // }, [dispatch, sections]);
+  const post = useSelector(selectPostBySlug(sectionSlug, postSlug));
+  const sectionTitle = useSelector(selectSectionTitleBySlug(sectionSlug));
 
-  console.log('x');
-
-  if (!sections.length) {
+  if (!post) {
     return <div>Loading</div>;
   }
 
@@ -49,9 +38,7 @@ const PostDetail = () => {
       <Box>
         <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
           <Link to="/">Home</Link>
-          <Link to={`/handbook/${sectionSlug}`}>
-            {correspondingSection.title}
-          </Link>
+          <Link to={`/handbook/${sectionSlug}`}>{sectionTitle}</Link>
           <Typography color="black" fontWeight="bold">
             {post.name}
           </Typography>
