@@ -11,48 +11,59 @@ import {
   Stack,
   IconButton,
   Button,
-  Link,
+  Link as MuiLink,
   Divider,
   Modal,
+  Fab,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import GrowthBox from '../../GrowthBox/GrowthBox';
 import PostCard from './PostCard/PostCard';
-import { Add, Delete } from '@mui/icons-material';
+import { Add, Delete, Edit, Hexagon } from '@mui/icons-material';
 import { removeSection } from '../../../thunks/sections';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { slugify } from '../../../utils/helpers';
-import moment from 'moment';
 import SquareIconButton from '../../Styled/SquareIconButton';
-import SquareButton from '../../Styled/SquareButon';
 import PostForm from '../../PostForm/PostForm';
-import LoadingSection from '../../Loading/LoadingSection';
 import {
   clearPost,
   clearSection,
-  setPost,
   setSection,
 } from '../../../features/sections/sectionsSlice';
+import SectionForm from '../../SectionForm/SectionForm';
 
-const Section = ({ section }) => {
+const Section = ({ section, isLast }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAdmin } = useSelector((state) => state.user);
   const { loading } = useSelector((state) => state.sections);
 
   const [openPostForm, setOpenPostForm] = useState(false);
+  const [openSectionForm, setOpenSectionForm] = useState(false);
+
+  const [postFormAction, setPostFormAction] = useState('');
 
   const { posts } = section;
-  // console.log(section);
+
+  const openEditPostFormModalHandler = () => {
+    setPostFormAction('update');
+    setOpenPostForm(true);
+  };
 
   const removeHandler = (id) => {
     dispatch(removeSection({ id }));
   };
 
-  const createPostHandler = () => {
+  const openCreatePostFormModalHandler = () => {
     dispatch(setSection(section));
+    setPostFormAction('createWithinSection');
     setOpenPostForm(true);
+  };
+
+  const openEditSectionFormModalHandler = () => {
+    dispatch(setSection(section));
+    setOpenSectionForm(true);
   };
 
   const viewHandler = (type) => {
@@ -67,17 +78,27 @@ const Section = ({ section }) => {
     setOpenPostForm(false);
   };
 
+  const onCloseSectionFormHandler = () => {
+    dispatch(clearSection());
+    setOpenSectionForm(false);
+  };
+
   return (
     <>
       <Box sx={{ mt: 5 }}>
         <Stack direction="row">
           <Stack>
-            <Link onClick={() => viewHandler(section.title)}>
-              <Typography variant="h4">{section.title}</Typography>
+            <Link
+              // underline="hover"
+              to={`/handbook/${slugify(section.title)}`}
+            >
+              <Typography
+                variant="h6"
+                sx={{ color: 'text.primary', fontWeight: 'bold' }}
+              >
+                {section.title}
+              </Typography>
             </Link>
-            <Typography variant="body1">
-              {`Created ${moment(section.createdAt).fromNow()}`}
-            </Typography>
           </Stack>
 
           {/* Admin tools */}
@@ -86,17 +107,22 @@ const Section = ({ section }) => {
               <GrowthBox />
               <Stack direction="row" alignItems="center" spacing={1}>
                 <SquareIconButton
-                  variant="contained"
                   size="small"
-                  color="inherit"
-                  onClick={createPostHandler}
+                  color="primary"
+                  onClick={openEditSectionFormModalHandler}
+                >
+                  <Edit />
+                </SquareIconButton>
+                <SquareIconButton
+                  size="small"
+                  color="success"
+                  onClick={openCreatePostFormModalHandler}
                 >
                   <Add />
                 </SquareIconButton>
                 <SquareIconButton
-                  variant="contained"
                   size="small"
-                  color="inherit"
+                  color="error"
                   onClick={() => removeHandler(section.id)}
                 >
                   <Delete />
@@ -105,49 +131,58 @@ const Section = ({ section }) => {
             </>
           )}
         </Stack>
-        <Divider sx={{ borderWidth: 1, mb: 1, mt: 1 }} />
-        <Grid container spacing={2}>
+        {/* <Divider sx={{ borderWidth: 1, mb: 1, mt: 1 }} /> */}
+        <Grid container spacing={2} sx={{ mt: 1 }}>
           {posts.map((post) => (
             <Grid key={post.id} item xl={3} sx={{ width: 300 }}>
               <PostCard
                 post={post}
                 type={section.title}
-                openPostFormModalHandler={() => setOpenPostForm(true)}
+                openPostFormModalHandler={openEditPostFormModalHandler}
               />
             </Grid>
           ))}
-          <Grid item xl={12}>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() => viewHandler(section.title)}
-              >
-                VIEW ALL
-              </Button>
-            </Box>
-          </Grid>
         </Grid>
+
+        {!isLast && (
+          <Divider textAlign="center" sx={{ mt: 2 }}>
+            <Hexagon color="action" />
+          </Divider>
+        )}
       </Box>
 
-      <Modal open={openPostForm} onClose={onClosePostFormHandler}>
+      <Modal
+        open={openPostForm || openSectionForm}
+        onClose={
+          openPostForm ? onClosePostFormHandler : onCloseSectionFormHandler
+        }
+      >
         <Box
           sx={{
             position: 'absolute',
-            top: '50%',
+            top: '35%',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
+            transform: 'translate(-50%, -35%)',
+            width: 800,
+            // minHeight: '60vh',
             bgcolor: 'background.paper',
             border: '2px solid #000',
             boxShadow: 24,
             p: 4,
           }}
         >
-          <PostForm
-            closePostFormModalHandler={() => setOpenPostForm(false)}
-            // sectionInfo={{ id: section.id, title: section.title }}
-          />
+          {openPostForm && (
+            <PostForm
+              closePostFormModalHandler={() => setOpenPostForm(false)}
+              action={postFormAction}
+            />
+          )}
+          {openSectionForm && (
+            <SectionForm
+              closeHandler={() => setOpenSectionForm(false)}
+              action="update"
+            />
+          )}
         </Box>
       </Modal>
     </>

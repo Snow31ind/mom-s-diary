@@ -7,6 +7,7 @@ import {
   removeSection,
   fetchSectionBySlug,
   updatePostById,
+  updateSection,
 } from '../../thunks/sections';
 
 const initialState = {
@@ -37,14 +38,17 @@ const sectionsSlice = createSlice({
   },
   extraReducers: {
     [fetchSections.pending]: (state) => {
+      state.status = 'loading';
       state.loading = true;
     },
     [fetchSections.fulfilled]: (state, action) => {
+      state.status = 'succeeded';
       state.sections = action.payload;
       state.loading = false;
       // state.status = 'success';
     },
     [fetchSections.rejected]: (state, action) => {
+      state.status = 'failed';
       state.error = action.payload;
       state.loading = false;
     },
@@ -174,6 +178,24 @@ const sectionsSlice = createSlice({
       state.sections = state.sections.filter((section) => section.id !== id);
     },
     [removeSection.rejected]: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
+    },
+    [updateSection.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateSection.fulfilled]: (state, action) => {
+      state.loading = false;
+
+      const updatedSection = action.payload;
+
+      state.sections = state.sections.map((section) =>
+        section.id !== updatedSection.id
+          ? section
+          : { ...section, ...updatedSection }
+      );
+    },
+    [updateSection.rejected]: (state, action) => {
       state.error = action.payload;
       state.loading = false;
     },

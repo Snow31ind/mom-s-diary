@@ -1,5 +1,5 @@
 import { Add } from '@mui/icons-material';
-import { Box, Modal, Stack, Typography } from '@mui/material';
+import { Box, Checkbox, Fab, Modal, Stack, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,19 +14,15 @@ import SectionForm from '../SectionForm/SectionForm';
 import SquareIconButton from '../Styled/SquareIconButton';
 import Section from './Section/Section';
 
-const Sections = () => {
+const Sections = (props) => {
   const sections = useSelector(selectSections());
   const loading = useSelector(selectLoading());
   const isAdmin = useSelector(selectIsAdmin());
 
   const [openSectionForm, setOpenSectionForm] = useState(false);
 
-  useEffect(() => {
-    console.log('Rerendering component Sections');
-  }, []);
-
   return (
-    <>
+    <React.Fragment>
       <Box>
         {isAdmin && (
           <Stack direction="row">
@@ -51,8 +47,12 @@ const Sections = () => {
         ) : (
           <>
             {/* Posts loaded */}
-            {sections.map((section) => (
-              <Section key={section.title} section={section} />
+            {sections.map((section, index) => (
+              <Section
+                key={section.title}
+                section={section}
+                isLast={index === sections.length - 1}
+              />
             ))}
           </>
         )}
@@ -62,10 +62,11 @@ const Sections = () => {
         <Box
           sx={{
             position: 'absolute',
-            top: '50%',
+            top: '35%',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
+            transform: 'translate(-50%, -35%)',
+            width: 800,
+            minHeight: '60vh',
             bgcolor: 'background.paper',
             border: '2px solid #000',
             boxShadow: 24,
@@ -73,11 +74,12 @@ const Sections = () => {
           }}
         >
           <SectionForm
-            closeSectionFormModalHandler={() => setOpenSectionForm(false)}
+            closeHandler={() => setOpenSectionForm(false)}
+            action="create"
           />
         </Box>
       </Modal>
-    </>
+    </React.Fragment>
   );
 };
 

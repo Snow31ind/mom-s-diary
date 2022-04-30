@@ -11,7 +11,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useEffect } from 'react';
+import { ref, uploadBytes } from 'firebase/storage';
+import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,7 +27,8 @@ import { createPost, updatePostById } from '../../thunks/sections';
 import GrowthBox from '../GrowthBox/GrowthBox';
 import defaultImage from '/images/memories.png';
 
-const PostForm = ({ closePostFormModalHandler }) => {
+// action = "create" | "update" | "createWithinSection"
+const PostForm = ({ closePostFormModalHandler, action }) => {
   const dispatch = useDispatch();
 
   const sections = useSelector(selectSections());
@@ -34,6 +36,8 @@ const PostForm = ({ closePostFormModalHandler }) => {
   const post = useSelector(selectPost());
   const section = useSelector(selectSection());
   const types = useSelector(selectSectionTypes());
+
+  const imageRef = useRef();
 
   const {
     register,
@@ -43,8 +47,9 @@ const PostForm = ({ closePostFormModalHandler }) => {
     setValue,
   } = useForm();
 
-  const isEditingPost = Boolean(post);
-  const isCreatingPost = Boolean(section);
+  const isEditingPost = action === 'update';
+  const isCreatingPost = action === 'create';
+  const isCreatingPostWithinSection = action === 'createWithinSection';
 
   useEffect(() => {
     if (isEditingPost) {
@@ -52,28 +57,33 @@ const PostForm = ({ closePostFormModalHandler }) => {
       setValue('name', post.name);
       setValue('desc', post.desc);
       setValue('content', post.content);
-      // setValue('photo', post.photo);
+      // setValue('photo', new File([new Blob()], post.photo, {}));
       setValue('sectionId', post.sectionId);
+
+      // const x = new File([new Blob()], post.photo);
+      // console.log('X:', x);
     }
-  }, [post]);
+  }, [post, isEditingPost]);
 
   const submitHandler = async ({ name, desc, content, sectionId, photo }) => {
     const data = {
       name,
       desc,
       content,
-      photo: photo[0] || defaultImage,
+      photo: photo[0].name,
       sectionId,
     };
+    const file = photo[0];
     // console.log(data);
 
     if (isEditingPost) {
       // Update post if the post in the storage management exists.
       console.log(data);
-      dispatch(updatePostById({ data, id: post.id }));
-    } else {
+      dispatch(updatePostById({ file, data, id: post.id }));
+    } else if (isCreatingPostWithinSection || isCreatingPost) {
       // Else we would create a new post
-      dispatch(createPost({ data }));
+      console.log(data);
+      dispatch(createPost({ file, data }));
     }
 
     closePostFormModalHandler();
@@ -87,7 +97,7 @@ const PostForm = ({ closePostFormModalHandler }) => {
     setValue('content', '');
     setValue('photo', '');
 
-    if (!isCreatingPost) {
+    if (!isCreatingPostWithinSection) {
       setValue('sectionId', '');
     }
   };
@@ -105,8 +115,9 @@ const PostForm = ({ closePostFormModalHandler }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <Typography textAlign="center" variant="h6" fontWeight="500">
-        {isEditingPost && 'Updating Post'}
-        {isCreatingPost && 'Creating New Post'}
+        {isEditingPost && 'Update post'}
+        {isCreatingPostWithinSection && 'New post'}
+        {isCreatingPost && 'New post'}
       </Typography>
 
       <form onSubmit={handleSubmit(submitHandler)}>
@@ -121,7 +132,11 @@ const PostForm = ({ closePostFormModalHandler }) => {
                 <FormControl fullWidth variant="filled">
                   <InputLabel id="select-type">Section title</InputLabel>
                   <Select
-                    disabled={isCreatingPost || isEditingPost ? true : false}
+                    disabled={
+                      isCreatingPostWithinSection || isEditingPost
+                        ? true
+                        : false
+                    }
                     labelId="select-type"
                     label="Type"
                     {...field}
@@ -151,6 +166,7 @@ const PostForm = ({ closePostFormModalHandler }) => {
                 <TextField
                   autoFocus
                   fullWidth
+                  multiline
                   variant="outlined"
                   label="Name *"
                   inputProps={{ type: 'text' }}
@@ -182,6 +198,9 @@ const PostForm = ({ closePostFormModalHandler }) => {
                 <TextField
                   autoFocus
                   fullWidth
+                  multiline
+                  minRows={2}
+                  maxRows={2}
                   variant="outlined"
                   label="Description *"
                   inputProps={{ type: 'text' }}
@@ -213,6 +232,9 @@ const PostForm = ({ closePostFormModalHandler }) => {
                 <TextField
                   autoFocus
                   fullWidth
+                  multiline
+                  minRows={12}
+                  maxRows={12}
                   variant="outlined"
                   label="Content *"
                   inputProps={{ type: 'text' }}

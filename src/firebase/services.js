@@ -23,10 +23,11 @@ import {
 } from 'firebase/firestore';
 import { postConverter } from '../utils/dataTypes/Post';
 import { sectionConverter } from '../utils/dataTypes/Section';
-import { auth, db } from './config';
+import { auth, db, storage } from './config';
 import * as firestore from 'firebase/firestore';
 import { slugify } from '../utils/helpers';
 import { RepeatOneSharp } from '@mui/icons-material';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 export const fetchPostsByType = async (type) => {
   const querySnapshot = await getDocs(
@@ -44,13 +45,21 @@ export const fetchPosts = async () => {
     query(collectionGroup(db, 'posts').withConverter(postConverter))
   );
 
-  return postsQuerySnapshop.docs.map((post) => {
-    // console.log('Post.data():', post.data());
-    return {
-      ...post.data(),
-      id: post.id,
-    };
-  });
+  // [?]: How to fetch image inside the map loop
+  const posts = postsQuerySnapshop.docs.map((post) => ({
+    ...post.data(),
+    id: post.id,
+  }));
+
+  // return posts;
+
+  const postsWithImage = [];
+
+  for (var post of posts) {
+    postsWithImage.push({ ...post, image: await getImage(post.photo) });
+  }
+
+  return postsWithImage;
 };
 
 export const fetchSectionTitles = async () => {
@@ -88,7 +97,14 @@ export const fetchSections = async () => {
   }));
 };
 
-export const createPost = async (post) => {
+export const createPost = async (file, post) => {
+  const storageRef = ref(storage, post.photo);
+  uploadBytes(storageRef, file)
+    .then((snapshot) => {
+      console.log(snapshot);
+      console.log('Uploaded a file');
+    })
+    .catch((error) => console.log(error));
   // console.log(data);
   const postRef = await addDoc(
     collection(db, 'handbook', post.sectionId, 'posts').withConverter(
@@ -106,9 +122,17 @@ export const createPost = async (post) => {
   return { id: addedPost.id, ...addedPost.data() };
 };
 
-export const updatePostById = async (id, post) => {
+export const updatePostById = async (file, id, post) => {
   try {
-    console.log(post);
+    // console.log(post);
+
+    const storageRef = ref(storage, post.photo);
+    uploadBytes(storageRef, file)
+      .then((snapshot) => {
+        console.log(snapshot);
+        console.log('Uploaded a file');
+      })
+      .catch((error) => console.log(error));
 
     const docRef = doc(
       db,
@@ -128,18 +152,24 @@ export const updatePostById = async (id, post) => {
   }
 };
 
-export const createSection = async (section, post) => {
+export const createSection = async (title, file, post) => {
   try {
+    const storageRef = ref(storage, post.photo);
+    uploadBytes(storageRef, file)
+      .then((snapshot) => {
+        console.log(snapshot);
+        console.log('Uploaded a file');
+      })
+      .catch((error) => console.log(error));
+
     const sectionRef = await addDoc(
       collection(db, 'handbook').withConverter(sectionConverter),
-      section
+      { title }
     );
 
     const addedSection = await getDoc(
       doc(db, 'handbook', sectionRef.id).withConverter(sectionConverter)
     );
-
-    console.log('X');
 
     const postRef = await addDoc(
       collection(db, 'handbook', sectionRef.id, 'posts').withConverter(
@@ -148,15 +178,11 @@ export const createSection = async (section, post) => {
       { ...post, sectionId: sectionRef.id }
     );
 
-    console.log('Y');
-
     const addedPost = await getDoc(
       doc(db, 'handbook', sectionRef.id, 'posts', postRef.id).withConverter(
         postConverter
       )
     );
-
-    console.log('Z');
 
     const newSection = {
       id: addedSection.id,
@@ -164,7 +190,7 @@ export const createSection = async (section, post) => {
       posts: [{ id: addedPost.id, ...addedPost.data() }],
     };
 
-    console.log(newSection);
+    // console.log(newSection);
 
     return newSection;
   } catch (error) {
@@ -182,6 +208,19 @@ export const removeSection = async (id) => {
   }
 
   await deleteDoc(doc(db, 'handbook', id));
+};
+
+export const updateSection = async (id, title) => {
+  await updateDoc(doc(db, 'handbook', id).withConverter(sectionConverter), {
+    title,
+    updatedAt: serverTimestamp(),
+  });
+
+  const updatedSection = await getDoc(
+    doc(db, 'handbook', id).withConverter(sectionConverter)
+  );
+
+  return { id: updatedSection.id, ...updatedSection.data() };
 };
 
 export const removePost = async (sectionId, id) => {
@@ -235,6 +274,16 @@ export const signUp = async (user) => {
 export const signOut = async () => {
   try {
     await signOutWithAuth(auth);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+export const getImage = async (name) => {
+  try {
+    const image = await getDownloadURL(ref(storage, name));
+
+    return image;
   } catch (error) {
     console.log(error.message);
   }

@@ -8,12 +8,10 @@ import {
   CardHeader,
   CardMedia,
   IconButton,
+  Link,
   Typography,
 } from '@mui/material';
 import React from 'react';
-import { useEffect } from 'react';
-import { useRef } from 'react';
-import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { removePost } from '../../../../thunks/sections';
@@ -22,14 +20,33 @@ import GrowthBox from '../../../GrowthBox/GrowthBox';
 import SquareIconButton from '../../../Styled/SquareIconButton';
 import moment from 'moment';
 import { setPost } from '../../../../features/sections/sectionsSlice';
+import { useState } from 'react';
+import { selectLoading } from '../../../../features/sections/selector';
 
 const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAdmin } = useSelector((state) => state.user);
+  const loading = useSelector(selectLoading());
 
-  const { sectionId, content, photo, desc, name, createdAt, updatedAt } = post;
-  const createdTime = new Date(createdAt).toLocaleString();
+  const [contentText, setContentText] = useState(
+    post.content.slice(0, post.content.indexOf(' ', 100))
+  );
+  // const [image, setImage] = useState(null);
+
+  const { sectionId, content, photo, desc, name, createdAt, updatedAt, image } =
+    post;
+
+  // useEffect(() => {
+  //   // console.log(post);
+  //   const fetchImage = async () => {
+  //     const imageUrl = await getImage(post.photo);
+  //     // console.log('Result:', res);
+  //     setImage(imageUrl);
+  //   };
+
+  //   fetchImage();
+  // }, [post]);
 
   const removeHandler = (sectionId, id) => {
     dispatch(removePost({ sectionId, id }));
@@ -47,26 +64,54 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
   return (
     <Card
       onClick={clickHandler}
-      elevation={2}
-      sx={{ height: '100%', borderRadius: 0 }}
+      elevation={0}
+      sx={{
+        height: '100%',
+        borderRadius: 0,
+        bgcolor: 'grey.100',
+        display: 'flex',
+        flexDirection: 'column',
+        borderWidth: '0 2px 0 0',
+        borderStyle: 'ridge',
+        pr: 1.8,
+      }}
     >
       <CardActionArea onClick={() => viewHandler(post)}>
-        <CardMedia
-          component="img"
-          src={photo}
-          alt={desc}
-          sx={{ width: '100%', height: 150 }}
-        />
+        {loading ? (
+          <Typography>Hello</Typography>
+        ) : (
+          <CardMedia
+            component="img"
+            src={image}
+            alt={name}
+            sx={{ width: '100%', height: 200, borderRadius: 5 }}
+          />
+        )}
       </CardActionArea>
 
-      <CardHeader
-        title={<Typography>{`${moment(createdAt).fromNow()}`}</Typography>}
-      />
-      <CardContent>
-        <Typography variant="h5">{name}</Typography>
-        <Typography variant="h6">{desc}</Typography>
-        <Typography variant="body2">{content}</Typography>
-        {/* <Typography>{new Date(createdAt).toISOString()}</Typography> */}
+      <CardContent sx={{ flex: 1 }}>
+        <Typography
+          variant="subtitle2"
+          gutterBottom
+          fontSize={14}
+          sx={{ mt: 1, color: 'text.secondary' }}
+        >{`${moment(createdAt).format('LL')}`}</Typography>
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          fontSize={22}
+          gutterBottom
+          sx={{ mt: 1 }}
+        >
+          {name}
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          fontSize={16}
+          sx={{ mt: 2, color: 'text.secondary' }}
+        >
+          {desc}
+        </Typography>
       </CardContent>
 
       {/* Admin tools */}
@@ -78,20 +123,14 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
         >
           <GrowthBox />
           <SquareIconButton
-            variant="contained"
             size="small"
-            color="inherit"
+            color="error"
             onClick={() => removeHandler(post.sectionId, post.id)}
           >
             <Delete />
           </SquareIconButton>
 
-          <SquareIconButton
-            variant="contained"
-            size="small"
-            color="inherit"
-            onClick={editHandler}
-          >
+          <SquareIconButton size="small" color="primary" onClick={editHandler}>
             <Edit />
           </SquareIconButton>
         </CardActions>

@@ -3,26 +3,28 @@ import {
   Avatar,
   Box,
   Button,
+  Divider,
   IconButton,
   Link,
   ListItemIcon,
   Menu,
   MenuItem,
   Modal,
+  Stack,
+  Switch,
   Toolbar,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
-import Login from '../../modals/Login';
 import GrowthBox from '../GrowthBox/GrowthBox';
 import LoginForm from '../LoginForm/LoginForm';
 import { useSelector, useDispatch } from 'react-redux';
 import { signOut } from '../../thunks/user';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { setUser } from '../../features/user/userSlice';
+import { useNavigate } from 'react-router-dom';
 import { selectInfo, selectIsAdmin } from '../../features/user/selector';
-import { Dashboard, Logout } from '@mui/icons-material';
+import { DarkMode, Dashboard, Logout } from '@mui/icons-material';
+import StyledBadge from '../Styled/StyledBadge';
+import { orange } from '@mui/material/colors';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -54,11 +56,13 @@ const Navbar = () => {
   };
 
   return (
-    <>
+    <React.Fragment>
       <AppBar>
         <Toolbar>
           <Link href="/">
-            <Typography color="white">{"Mom's diary"}</Typography>
+            <Typography color="secondary.main" fontFamily="Helvetica">
+              {"Mom's diary"}
+            </Typography>
           </Link>
           <GrowthBox />
           {!info ? (
@@ -68,40 +72,24 @@ const Navbar = () => {
           ) : isAdmin ? (
             <>
               <IconButton onClick={openMenuHandler}>
-                <Avatar>A</Avatar>
+                <StyledBadge
+                  variant="dot"
+                  overlap="circular"
+                  anchorOrigin={{
+                    horizontal: 'right',
+                    vertical: 'bottom',
+                  }}
+                >
+                  <Avatar sx={{ bgcolor: orange[400], width: 40, height: 40 }}>
+                    A
+                  </Avatar>
+                </StyledBadge>
               </IconButton>
 
               <Menu
                 open={isMenuOpened}
                 anchorEl={anchorEl}
                 onClose={closeMenuHandler}
-                PaperProps={{
-                  elevation: 0,
-                  sx: {
-                    overflow: 'visible',
-                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                    mt: 1.5,
-                    '& .MuiAvatar-root': {
-                      width: 32,
-                      height: 32,
-                      ml: -0.5,
-                      mr: 1,
-                    },
-                    '&:before': {
-                      content: '""',
-                      display: 'block',
-                      position: 'absolute',
-                      top: 0,
-                      right: 14,
-                      width: 10,
-                      height: 10,
-                      bgcolor: 'background.paper',
-                      transform: 'translateY(-50%) rotate(45deg)',
-                      zIndex: 0,
-                    },
-                  },
-                }}
-                transformOrigin
               >
                 <MenuItem onClick={() => navigate('/admin')}>
                   <ListItemIcon>
@@ -109,7 +97,19 @@ const Navbar = () => {
                   </ListItemIcon>
                   <Typography>Dashboard</Typography>
                 </MenuItem>
-
+                <MenuItem sx={{ display: 'flex' }}>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    display="flex"
+                    // bgcolor="gray"
+                    flex={1}
+                  >
+                    <DarkMode />
+                    <Switch sx={{}} label="Dark mode" />
+                  </Stack>
+                </MenuItem>
+                <Divider />
                 <MenuItem onClick={signOutHandler}>
                   <ListItemIcon>
                     <Logout />
@@ -143,7 +143,7 @@ const Navbar = () => {
           <LoginForm closeLoginModalHandler={closeLoginModalHandler} />
         </Box>
       </Modal>
-    </>
+    </React.Fragment>
   );
 };
 

@@ -3,15 +3,17 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
+  CardMedia,
   IconButton,
+  Link as MuiLink,
   Typography,
 } from '@mui/material';
 import { Box } from '@mui/system';
-import React from 'react';
+import React, { useState } from 'react';
 import { Edit, Delete } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { removePost } from '../../thunks/sections';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { slugify } from '../../utils/helpers';
 import { selectIsAdmin } from '../../features/user/selector';
 
@@ -20,6 +22,10 @@ const PostListItem = ({ post, sectionTitle }) => {
   const isAdmin = useSelector(selectIsAdmin());
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [contentText, setContentText] = useState(
+    post.content.slice(0, post.content.indexOf(' ', 600))
+  );
 
   const viewHandler = (id) => {
     navigate(`/handbook/${slugify(sectionTitle)}/${slugify(post.name)}`);
@@ -32,20 +38,36 @@ const PostListItem = ({ post, sectionTitle }) => {
   const editHandler = () => {};
 
   return (
-    <Card elevation={1} sx={{ mt: 3, borderRadius: 0 }}>
+    <Card elevation={0} sx={{ mt: 3, borderRadius: 0, bgcolor: 'grey.100' }}>
       <CardActionArea onClick={() => viewHandler(post.id)}>
-        <CardContent>
-          <Box sx={{ display: 'flex' }}>
-            <img src={post.photo} width={150} />
-            <Box>
-              <Typography variant="h4">{post.name}</Typography>
-              <Typography variant="h6">{post.desc}</Typography>
-              <Typography variant="body2">{post.content}</Typography>
-            </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+          }}
+        >
+          <img src={post.image} width={200} style={{ borderRadius: 5 }} />
+          <Box sx={{ ml: 2 }}>
+            <Typography variant="h5" fontWeight="bold">
+              {post.name}
+            </Typography>
+            <Typography variant="body1" sx={{ mt: 1 }}>
+              {post.desc}
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {contentText}
+              {'...'}
+              <Link
+                to={`/handbook/${slugify(sectionTitle)}/${slugify(post.name)}`}
+              >
+                Read more
+              </Link>
+            </Typography>
           </Box>
-        </CardContent>
+        </Box>
       </CardActionArea>
-      {isAdmin && (
+      {/* {isAdmin && (
         <CardActions>
           <IconButton
             color="warning"
@@ -58,7 +80,7 @@ const PostListItem = ({ post, sectionTitle }) => {
             <Edit />
           </IconButton>
         </CardActions>
-      )}
+      )} */}
     </Card>
   );
 };

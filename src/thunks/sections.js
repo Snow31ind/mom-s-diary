@@ -25,9 +25,9 @@ export const fetchSectionBySlug = createAsyncThunk(
 export const createPost = createAsyncThunk(
   '/posts/createPost',
   async (params, thunkAPI) => {
-    const { data } = params;
+    const { file, data } = params;
     // console.log(data);
-    const post = await api.createPost(data);
+    const post = await api.createPost(file, data);
     console.log(post);
 
     return post;
@@ -50,10 +50,10 @@ export const removePost = createAsyncThunk(
 export const updatePostById = createAsyncThunk(
   '/post/update',
   async (params, thunkAPI) => {
-    const { data, id } = params;
+    const { file, data, id } = params;
     console.log(data, id);
 
-    const updatedPost = await api.updatePostById(id, data);
+    const updatedPost = await api.updatePostById(file, id, data);
     console.log(updatedPost);
 
     return updatedPost;
@@ -63,10 +63,10 @@ export const updatePostById = createAsyncThunk(
 export const createSection = createAsyncThunk(
   '/section/createSection',
   async (params, thunkAPI) => {
-    const { section, post } = params;
-    console.log(section, post);
+    const { title, file, post } = params;
+    // console.log(section, post);
 
-    const createdSection = await api.createSection(section, post);
+    const createdSection = await api.createSection(title, file, post);
 
     return createdSection;
   }
@@ -84,5 +84,17 @@ export const removeSection = createAsyncThunk(
     } catch (error) {
       console.log(error);
     }
+  }
+);
+
+export const updateSection = createAsyncThunk(
+  '/section/update',
+  async (params, thunkAPI) => {
+    console.log(params);
+    const { title, id } = params;
+    console.log(title, id);
+    const updatedSection = await api.updateSection(id, title);
+
+    return updatedSection;
   }
 );

@@ -25,12 +25,6 @@ const Dashboard = ({ selectedSection }) => {
       icon: <DynamicFeed />,
       onClick: () => navigate('/admin/posts'),
     },
-    {
-      name: 'Users',
-      label: 'users',
-      icon: <Person />,
-      onClick: () => navigate('/admin/users'),
-    },
   ];
 
   return (

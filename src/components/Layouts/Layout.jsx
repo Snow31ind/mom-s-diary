@@ -3,13 +3,25 @@ import React from 'react';
 import DrawerHeader from '../DrawerHeader/DrawerHeader';
 import Navbar from '../Navbar/Navbar';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, fullWidth }) => {
   return (
-    <Box>
+    <Box sx={{ bgcolor: 'grey.200', width: '100%' }}>
       <Navbar />
       <DrawerHeader />
 
-      <Container maxWidth="xl">{children}</Container>
+      {fullWidth ? (
+        <Box sx={{ bgcolor: 'grey.100', minHeight: '100vh' }}>{children}</Box>
+      ) : (
+        <Container
+          maxWidth="xl"
+          sx={{
+            bgcolor: 'grey.100',
+            minHeight: '100vh',
+          }}
+        >
+          {children}
+        </Container>
+      )}
     </Box>
   );
 };

@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Outlet, useParams } from 'react-router-dom';
 import Layout from '../../components/Layouts/Layout';
 import { useDispatch, useSelector } from 'react-redux';
 import PostListItem from '../../components/PostListItem/PostListItem';
@@ -28,6 +28,7 @@ const SectionDetail = () => {
 
   return (
     <Layout>
+      <Outlet />
       {/* <Typography>{type}</Typography> */}
       <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
         <Link to="/">Home</Link>
@@ -35,7 +36,6 @@ const SectionDetail = () => {
           {section.title}
         </Typography>
       </Breadcrumbs>
-      <Typography>{section.title}</Typography>
       <List>
         {section.posts.map((post) => (
           <PostListItem
