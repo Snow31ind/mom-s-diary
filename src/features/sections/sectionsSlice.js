@@ -145,7 +145,7 @@ const sectionsSlice = createSlice({
       state.loading = false;
       state.sections = [...state.sections, section];
 
-      toast.success(postUpdatedMessage(updatedPost), {
+      toast.success(sectionUpdatedMessage(section), {
         onOpen: (props) => toast.dismiss(TOAST_LOADING),
       });
     },
