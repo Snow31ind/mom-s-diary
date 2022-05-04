@@ -15,6 +15,7 @@ import {
   Divider,
   Modal,
   Fab,
+  Tooltip,
 } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,6 +33,7 @@ import {
   setSection,
 } from '../../../features/sections/sectionsSlice';
 import SectionForm from '../../SectionForm/SectionForm';
+import CustomSlider from '../../Slider/CustomSlider';
 
 const Section = ({ section, isLast }) => {
   const dispatch = useDispatch();
@@ -85,7 +87,7 @@ const Section = ({ section, isLast }) => {
 
   return (
     <>
-      <Box sx={{ mt: 5 }}>
+      <Box sx={{ mt: 2 }}>
         <Stack direction="row">
           <Stack>
             <Link
@@ -106,46 +108,56 @@ const Section = ({ section, isLast }) => {
             <>
               <GrowthBox />
               <Stack direction="row" alignItems="center" spacing={1}>
-                <SquareIconButton
-                  size="small"
-                  color="primary"
-                  onClick={openEditSectionFormModalHandler}
-                >
-                  <Edit />
-                </SquareIconButton>
-                <SquareIconButton
-                  size="small"
-                  color="success"
-                  onClick={openCreatePostFormModalHandler}
-                >
-                  <Add />
-                </SquareIconButton>
-                <SquareIconButton
-                  size="small"
-                  color="error"
-                  onClick={() => removeHandler(section.id)}
-                >
-                  <Delete />
-                </SquareIconButton>
+                <Tooltip title="Edit section">
+                  <SquareIconButton
+                    size="small"
+                    color="primary"
+                    onClick={openEditSectionFormModalHandler}
+                  >
+                    <Edit />
+                  </SquareIconButton>
+                </Tooltip>
+
+                <Tooltip title="New post">
+                  <SquareIconButton
+                    size="small"
+                    color="success"
+                    onClick={openCreatePostFormModalHandler}
+                  >
+                    <Add />
+                  </SquareIconButton>
+                </Tooltip>
+
+                {!posts.length && (
+                  <Tooltip title="Remove section">
+                    <SquareIconButton
+                      size="small"
+                      color="error"
+                      onClick={() => removeHandler(section.id)}
+                    >
+                      <Delete />
+                    </SquareIconButton>
+                  </Tooltip>
+                )}
               </Stack>
             </>
           )}
         </Stack>
-        {/* <Divider sx={{ borderWidth: 1, mb: 1, mt: 1 }} /> */}
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          {posts.map((post) => (
-            <Grid key={post.id} item xl={3} sx={{ width: 300 }}>
-              <PostCard
-                post={post}
-                type={section.title}
-                openPostFormModalHandler={openEditPostFormModalHandler}
-              />
-            </Grid>
-          ))}
-        </Grid>
+
+        <CustomSlider
+          data={posts}
+          renderItem={(post) => (
+            <PostCard
+              post={post}
+              type={section.title}
+              openPostFormModalHandler={openEditPostFormModalHandler}
+            />
+          )}
+          renderKey={(post) => post.id}
+        ></CustomSlider>
 
         {!isLast && (
-          <Divider textAlign="center" sx={{ mt: 2 }}>
+          <Divider textAlign="center" sx={{ mt: 4 }}>
             <Hexagon color="action" />
           </Divider>
         )}

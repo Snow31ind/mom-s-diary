@@ -29,31 +29,32 @@ const SectionForm = ({ action, closeHandler }) => {
   const section = useSelector(selectSection());
 
   const isCreatingSection = action === 'create';
-  const isUpdateingSection = action === 'update';
+  const isUpdatingSection = action === 'update';
 
   useEffect(() => {
-    if (isUpdateingSection) {
+    if (isUpdatingSection) {
       setValue('title', section.title);
     }
   }, [action]);
 
-  const submitHandler = ({ title, name, desc, content, photo }) => {
+  const submitHandler = ({ title, id, name, photo }) => {
     if (isCreatingSection) {
-      const post = {
-        name,
-        desc,
-        content,
-        photo: photo[0].name,
-      };
-
       const file = photo[0];
 
-      dispatch(createSection({ title, file, post }));
+      const section = {
+        title,
+        name,
+        photo: file.name,
+      };
+
+      dispatch(createSection({ section, id, file }));
       clearForm();
       closeHandler();
-    } else if (isUpdateingSection) {
-      console.log({ title, id: section.id });
-      dispatch(updateSection({ title, id: section.id }));
+    } else if (isUpdatingSection) {
+      const section = {
+        title,
+      };
+      dispatch(updateSection({ section, id }));
       clearForm();
       closeHandler();
     }
@@ -66,7 +67,7 @@ const SectionForm = ({ action, closeHandler }) => {
       setValue('desc', '');
       setValue('content', '');
       setValue('image', '');
-    } else if (isUpdateingSection) {
+    } else if (isUpdatingSection) {
       setValue('title', section.title);
     }
   };
@@ -75,12 +76,13 @@ const SectionForm = ({ action, closeHandler }) => {
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <Typography textAlign="center" variant="h6" fontWeight="bold">
         {isCreatingSection && 'New section'}
-        {isUpdateingSection && 'Update section'}
+        {isUpdatingSection && 'Update section'}
       </Typography>
 
       <form onSubmit={handleSubmit(submitHandler)}>
         <List>
-          {isUpdateingSection && (
+          {/* ID */}
+          {isUpdatingSection && (
             <ListItem>
               <Controller
                 name="id"
@@ -100,7 +102,7 @@ const SectionForm = ({ action, closeHandler }) => {
             </ListItem>
           )}
 
-          {/* Section title */}
+          {/* Title */}
           <ListItem>
             <Controller
               name="title"
@@ -114,7 +116,7 @@ const SectionForm = ({ action, closeHandler }) => {
                   autoFocus
                   fullWidth
                   variant="outlined"
-                  label="Section title*"
+                  label="Title"
                   inputProps={{ type: 'text' }}
                   error={Boolean(errors.title)}
                   helperText={
@@ -130,9 +132,42 @@ const SectionForm = ({ action, closeHandler }) => {
             />
           </ListItem>
 
+          {/* Type & name */}
           {isCreatingSection && (
             <React.Fragment>
-              {/* Name */}
+              <ListItem>
+                <Controller
+                  name="id"
+                  control={control}
+                  defaultValue={''}
+                  rules={{
+                    required: true,
+                    minLength: 1,
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      autoFocus
+                      fullWidth
+                      multiline
+                      variant="outlined"
+                      label="ID"
+                      inputProps={{ type: 'text' }}
+                      minRows={2}
+                      maxRows={2}
+                      error={Boolean(errors.id)}
+                      helperText={
+                        errors.id
+                          ? errors.id.type === 'minLength'
+                            ? 'ID is invalid'
+                            : 'ID is required'
+                          : ''
+                      }
+                      {...field}
+                    />
+                  )}
+                />
+              </ListItem>
+
               <ListItem>
                 <Controller
                   name="name"
@@ -148,7 +183,7 @@ const SectionForm = ({ action, closeHandler }) => {
                       fullWidth
                       multiline
                       variant="outlined"
-                      label="Name*"
+                      label="Name"
                       inputProps={{ type: 'text' }}
                       minRows={2}
                       maxRows={2}
@@ -166,75 +201,6 @@ const SectionForm = ({ action, closeHandler }) => {
                 />
               </ListItem>
 
-              {/* Description */}
-              <ListItem>
-                <Controller
-                  name="desc"
-                  control={control}
-                  defaultValue={''}
-                  rules={{
-                    required: true,
-                    minLength: 1,
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      autoFocus
-                      fullWidth
-                      multiline
-                      minRows={3}
-                      maxRows={3}
-                      variant="outlined"
-                      label="Description *"
-                      inputProps={{ type: 'text' }}
-                      error={Boolean(errors.desc)}
-                      helperText={
-                        errors.desc
-                          ? errors.desc.type === 'minLength'
-                            ? 'Description is invalid'
-                            : 'Description is required'
-                          : ''
-                      }
-                      {...field}
-                    />
-                  )}
-                />
-              </ListItem>
-
-              {/* Content */}
-              <ListItem>
-                <Controller
-                  name="content"
-                  control={control}
-                  defaultValue={''}
-                  rules={{
-                    required: true,
-                    minLength: 1,
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      autoFocus
-                      fullWidth
-                      multiline
-                      minRows={12}
-                      // maxRows={16}
-                      maxRows={12}
-                      variant="outlined"
-                      label="Content *"
-                      inputProps={{ type: 'text' }}
-                      error={Boolean(errors.desc)}
-                      helperText={
-                        errors.content
-                          ? errors.content.type === 'minLength'
-                            ? 'Content is invalid'
-                            : 'Content is required'
-                          : ''
-                      }
-                      {...field}
-                    />
-                  )}
-                />
-              </ListItem>
-
               {/* Image */}
               <ListItem>
                 <input {...register('photo')} type="file" />
@@ -242,6 +208,7 @@ const SectionForm = ({ action, closeHandler }) => {
             </React.Fragment>
           )}
 
+          {/* Submit button */}
           <ListItem
             sx={{
               display: 'flex',

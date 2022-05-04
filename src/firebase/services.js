@@ -6,7 +6,6 @@ import {
 import {
   addDoc,
   collection,
-  collectionGroup,
   deleteDoc,
   doc,
   getDocs,
@@ -17,180 +16,129 @@ import {
   limit,
   where,
   getDoc,
-  Firestore,
   orderBy,
   updateDoc,
 } from 'firebase/firestore';
 import { postConverter } from '../utils/dataTypes/Post';
 import { sectionConverter } from '../utils/dataTypes/Section';
 import { auth, db, storage } from './config';
-import * as firestore from 'firebase/firestore';
-import { slugify } from '../utils/helpers';
-import { RepeatOneSharp } from '@mui/icons-material';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 export const fetchPostsByType = async (type) => {
   const querySnapshot = await getDocs(
-    collection(db, 'handbook', type, 'posts').withConverter(postConverter)
+    collection(db, type).withConverter(postConverter)
   );
 
-  return querySnapshot.docs.map((doc) => ({
-    ...doc.data(),
-    id: doc.id,
-  }));
-};
-
-export const fetchPosts = async () => {
-  const postsQuerySnapshop = await getDocs(
-    query(collectionGroup(db, 'posts').withConverter(postConverter))
-  );
-
-  // [?]: How to fetch image inside the map loop
-  const posts = postsQuerySnapshop.docs.map((post) => ({
-    ...post.data(),
-    id: post.id,
+  const posts = querySnapshot.docs.map((snapshot) => ({
+    ...snapshot.data(),
+    id: snapshot.id,
   }));
 
-  // return posts;
-
-  const postsWithImage = [];
+  var data = [];
 
   for (var post of posts) {
-    postsWithImage.push({ ...post, image: await getImage(post.photo) });
+    const image = await getImage(post.photo);
+
+    data = [...data, { ...post, image }];
   }
 
-  return postsWithImage;
-};
-
-export const fetchSectionTitles = async () => {
-  const querySnapshot = await getDocs(
-    query(
-      collection(db, 'handbook').withConverter(sectionConverter),
-      orderBy('title', 'asc')
-    )
-  );
-
-  return querySnapshot.docs.map((doc) => ({
-    ...doc.data(),
-    id: doc.id,
-  }));
-};
-
-export const fetchSectionBySlug = async (slug) => {
-  try {
-    const sections = await fetchSections();
-    return sections.find((section) => slugify(section.title) === slug);
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-export const fetchSections = async () => {
-  // Query all sections
-  const sections = await fetchSectionTitles();
-  // Query all posts
-  const posts = await fetchPosts();
-
-  return sections.map((section) => ({
-    ...section,
-    posts: posts.filter((post) => post.sectionId === section.id),
-  }));
+  return data;
 };
 
 export const createPost = async (file, post) => {
-  const storageRef = ref(storage, post.photo);
-  uploadBytes(storageRef, file)
-    .then((snapshot) => {
-      console.log(snapshot);
-      console.log('Uploaded a file');
-    })
-    .catch((error) => console.log(error));
-  // console.log(data);
-  const postRef = await addDoc(
-    collection(db, 'handbook', post.sectionId, 'posts').withConverter(
-      postConverter
-    ),
-    post
-  );
+  try {
+    await uploadBytes(ref(storage, post.photo), file);
 
-  const addedPost = await getDoc(
-    doc(db, 'handbook', post.sectionId, 'posts', postRef.id).withConverter(
-      postConverter
-    )
-  );
+    // Fetch file from cloud storage
+    const image = await getImage(file.name);
 
-  return { id: addedPost.id, ...addedPost.data() };
+    // console.log(data);
+    const postRef = await addDoc(
+      collection(db, post.sectionId).withConverter(postConverter),
+      post
+    );
+
+    return { ...post, id: postRef.id, image };
+  } catch (error) {
+    console.log(error.message);
+  }
+  // Upload file to cloud storage
 };
 
 export const updatePostById = async (file, id, post) => {
   try {
-    // console.log(post);
+    if (file) {
+      await uploadBytes(ref(storage, post.photo), file);
+    }
 
-    const storageRef = ref(storage, post.photo);
-    uploadBytes(storageRef, file)
-      .then((snapshot) => {
-        console.log(snapshot);
-        console.log('Uploaded a file');
-      })
-      .catch((error) => console.log(error));
+    await updateDoc(doc(db, post.sectionId, id).withConverter(postConverter), {
+      ...post,
+      updatedAt: serverTimestamp(),
+    });
 
-    const docRef = doc(
-      db,
-      'handbook',
-      post.sectionId,
-      'posts',
-      id
-    ).withConverter(postConverter);
+    const updatedPost = await getDoc(
+      doc(db, post.sectionId, id).withConverter(postConverter)
+    );
 
-    await updateDoc(docRef, { ...post, updatedAt: serverTimestamp() });
+    const image = await getImage(post.photo);
 
-    const updatedPost = await getDoc(docRef);
-
-    return { id: updatedPost.id, ...updatedPost.data() };
+    return { ...updatedPost.data(), id, image };
   } catch (error) {
     console.log(error.message);
   }
 };
 
-export const createSection = async (title, file, post) => {
+export const removePost = async (sectionId, id) => {
+  await deleteDoc(doc(db, sectionId, id));
+};
+
+export const fetchSections = async () => {
   try {
-    const storageRef = ref(storage, post.photo);
-    uploadBytes(storageRef, file)
-      .then((snapshot) => {
-        console.log(snapshot);
-        console.log('Uploaded a file');
-      })
-      .catch((error) => console.log(error));
-
-    const sectionRef = await addDoc(
-      collection(db, 'handbook').withConverter(sectionConverter),
-      { title }
+    // Query all sections
+    const querySnapshot = await getDocs(
+      collection(db, 'handbook').withConverter(sectionConverter)
     );
 
-    const addedSection = await getDoc(
-      doc(db, 'handbook', sectionRef.id).withConverter(sectionConverter)
+    const sections = querySnapshot.docs.map((snapshot) => ({
+      ...snapshot.data(),
+      id: snapshot.id,
+    }));
+
+    var data = [];
+    // Query all posts that belong to each section
+    for (var section of sections) {
+      const posts = await fetchPostsByType(section.id);
+      data = [...data, { ...section, posts }];
+    }
+
+    console.log(data);
+
+    return data;
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+export const createSection = async (section, id, file) => {
+  try {
+    // Upload file to storage
+    await uploadBytes(ref(storage, section.photo), file);
+
+    // Create new section in collection handbook
+    await setDoc(
+      doc(db, 'handbook', id).withConverter(sectionConverter),
+      section
     );
 
-    const postRef = await addDoc(
-      collection(db, 'handbook', sectionRef.id, 'posts').withConverter(
-        postConverter
-      ),
-      { ...post, sectionId: sectionRef.id }
-    );
-
-    const addedPost = await getDoc(
-      doc(db, 'handbook', sectionRef.id, 'posts', postRef.id).withConverter(
-        postConverter
-      )
-    );
+    // Get image that was uploaded to the storage
+    const image = await getImage(section.photo);
 
     const newSection = {
-      id: addedSection.id,
-      ...addedSection.data(),
-      posts: [{ id: addedPost.id, ...addedPost.data() }],
+      ...section,
+      id,
+      image,
+      posts: [],
     };
-
-    // console.log(newSection);
 
     return newSection;
   } catch (error) {
@@ -199,20 +147,12 @@ export const createSection = async (title, file, post) => {
 };
 
 export const removeSection = async (id) => {
-  // Retrieve all posts and delete them.
-  const docRef = await getDocs(collection(db, 'handbook', id, 'posts'));
-  const postIds = docRef.docs.map((post) => post.id);
-  // console.log(postIds);
-  for (var postId of postIds) {
-    await deleteDoc(doc(db, 'handbook', postId, 'posts', id));
-  }
-
   await deleteDoc(doc(db, 'handbook', id));
 };
 
-export const updateSection = async (id, title) => {
+export const updateSection = async (id, section) => {
   await updateDoc(doc(db, 'handbook', id).withConverter(sectionConverter), {
-    title,
+    ...section,
     updatedAt: serverTimestamp(),
   });
 
@@ -220,20 +160,7 @@ export const updateSection = async (id, title) => {
     doc(db, 'handbook', id).withConverter(sectionConverter)
   );
 
-  return { id: updatedSection.id, ...updatedSection.data() };
-};
-
-export const removePost = async (sectionId, id) => {
-  const colRef = collection(db, 'handbook', sectionId, 'posts');
-  const querySnapshot = query(colRef, limit(2));
-  const posts = await getDocs(querySnapshot);
-  console.log(posts.docs.length);
-
-  await deleteDoc(doc(db, 'handbook', sectionId, 'posts', id));
-
-  if (posts.docs.length === 1) {
-    await deleteDoc(doc(db, 'handbook', sectionId));
-  }
+  return { ...updatedSection.data(), id };
 };
 
 export const signIn = async (user) => {

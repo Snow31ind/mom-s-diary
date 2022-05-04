@@ -13,12 +13,10 @@ const routes = [
   {
     path: '/',
     element: <Navigate to="/handbook" replace={true} />,
-    caseSensitive: true,
   },
   {
     path: '/handbook',
     element: <Home />,
-    caseSensitive: true,
   },
   {
     path: '/handbook/:sectionSlug',

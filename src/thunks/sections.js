@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import * as api from '../firebase/services';
+import { toast } from 'react-toastify';
 
 export const fetchSections = createAsyncThunk(
   '/section/fetchSections',
@@ -14,9 +15,7 @@ export const fetchSectionBySlug = createAsyncThunk(
   'section/postSectionById',
   async (params, thunkAPI) => {
     const { sectionSlug } = params;
-
     const section = await api.fetchSectionBySlug(sectionSlug);
-    console.log(section);
 
     return section;
   }
@@ -26,11 +25,9 @@ export const createPost = createAsyncThunk(
   '/posts/createPost',
   async (params, thunkAPI) => {
     const { file, data } = params;
-    // console.log(data);
-    const post = await api.createPost(file, data);
-    console.log(post);
+    const createdPost = await api.createPost(file, data);
 
-    return post;
+    return createdPost;
   }
 );
 
@@ -38,9 +35,6 @@ export const removePost = createAsyncThunk(
   '/post/removePost',
   async (params, thunkAPI) => {
     const { sectionId, id } = params;
-
-    // console.log(type, id);
-
     await api.removePost(sectionId, id);
 
     return { sectionId, id };
@@ -51,10 +45,7 @@ export const updatePostById = createAsyncThunk(
   '/post/update',
   async (params, thunkAPI) => {
     const { file, data, id } = params;
-    console.log(data, id);
-
     const updatedPost = await api.updatePostById(file, id, data);
-    console.log(updatedPost);
 
     return updatedPost;
   }
@@ -63,10 +54,9 @@ export const updatePostById = createAsyncThunk(
 export const createSection = createAsyncThunk(
   '/section/createSection',
   async (params, thunkAPI) => {
-    const { title, file, post } = params;
-    // console.log(section, post);
+    const { section, file, id } = params;
 
-    const createdSection = await api.createSection(title, file, post);
+    const createdSection = await api.createSection(section, id, file);
 
     return createdSection;
   }
@@ -76,24 +66,18 @@ export const removeSection = createAsyncThunk(
   '/section/removeSection',
   async (params, thunkAPI) => {
     const { id } = params;
-    // console.log(id);
+    await api.removeSection(id);
 
-    try {
-      await api.removeSection(id);
-      return id;
-    } catch (error) {
-      console.log(error);
-    }
+    return id;
   }
 );
 
 export const updateSection = createAsyncThunk(
   '/section/update',
   async (params, thunkAPI) => {
-    console.log(params);
-    const { title, id } = params;
-    console.log(title, id);
-    const updatedSection = await api.updateSection(id, title);
+    const { section, id } = params;
+
+    const updatedSection = await api.updateSection(id, section);
 
     return updatedSection;
   }

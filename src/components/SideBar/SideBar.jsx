@@ -9,7 +9,7 @@ import {
 import React from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-const Dashboard = ({ selectedSection }) => {
+const SideBar = ({ selectedSection }) => {
   const navigate = useNavigate();
 
   const sections = [
@@ -43,4 +43,4 @@ const Dashboard = ({ selectedSection }) => {
   );
 };
 
-export default Dashboard;
+export default SideBar;

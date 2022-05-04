@@ -37,8 +37,6 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
   const section = useSelector(selectSection());
   const types = useSelector(selectSectionTypes());
 
-  const imageRef = useRef();
-
   const {
     register,
     handleSubmit,
@@ -57,37 +55,39 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
       setValue('name', post.name);
       setValue('desc', post.desc);
       setValue('content', post.content);
-      // setValue('photo', new File([new Blob()], post.photo, {}));
       setValue('sectionId', post.sectionId);
-
-      // const x = new File([new Blob()], post.photo);
-      // console.log('X:', x);
     }
   }, [post, isEditingPost]);
 
   const submitHandler = async ({ name, desc, content, sectionId, photo }) => {
-    const data = {
-      name,
-      desc,
-      content,
-      photo: photo[0].name,
-      sectionId,
-    };
-    const file = photo[0];
-    // console.log(data);
-
     if (isEditingPost) {
+      // console.log(photo);
+      const data = {
+        name,
+        desc,
+        content,
+        photo: photo.length ? photo[0].name : post.photo,
+        sectionId,
+      };
+      const file = photo.length ? photo[0] : null;
+
       // Update post if the post in the storage management exists.
-      console.log(data);
       dispatch(updatePostById({ file, data, id: post.id }));
     } else if (isCreatingPostWithinSection || isCreatingPost) {
       // Else we would create a new post
-      console.log(data);
+      const data = {
+        name,
+        desc,
+        content,
+        photo: photo[0].name,
+        sectionId,
+      };
+      const file = photo[0];
+
       dispatch(createPost({ file, data }));
     }
 
     closePostFormModalHandler();
-
     clearHandler();
   };
 

@@ -1,14 +1,21 @@
 import { Edit, Remove, Delete } from '@mui/icons-material';
 import {
   Box,
+  Button,
   Card,
   CardActionArea,
   CardActions,
   CardContent,
   CardHeader,
   CardMedia,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   Link,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React from 'react';
@@ -22,6 +29,12 @@ import moment from 'moment';
 import { setPost } from '../../../../features/sections/sectionsSlice';
 import { useState } from 'react';
 import { selectLoading } from '../../../../features/sections/selector';
+import {
+  closeDialog,
+  createDialogState,
+  onProcessWithDialog,
+  setDialog,
+} from '../../../../features/dialog/dialogSlice';
 
 const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
   const dispatch = useDispatch();
@@ -37,19 +50,22 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
   const { sectionId, content, photo, desc, name, createdAt, updatedAt, image } =
     post;
 
-  // useEffect(() => {
-  //   // console.log(post);
-  //   const fetchImage = async () => {
-  //     const imageUrl = await getImage(post.photo);
-  //     // console.log('Result:', res);
-  //     setImage(imageUrl);
-  //   };
-
-  //   fetchImage();
-  // }, [post]);
-
   const removeHandler = (sectionId, id) => {
     dispatch(removePost({ sectionId, id }));
+  };
+
+  const openDialogToRemoveHandler = (sectionId, id) => {
+    dispatch(
+      setDialog(
+        createDialogState(
+          true,
+          'Post removal',
+          'Are you sure you want to remove this post?',
+          'Cancel',
+          'Process'
+        )
+      )
+    );
   };
 
   const editHandler = () => {
@@ -73,7 +89,10 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
         flexDirection: 'column',
         borderWidth: '0 2px 0 0',
         borderStyle: 'ridge',
-        pr: 1.8,
+        pr: 1.7,
+        flex: 1,
+        ml: 1,
+        mr: 1,
       }}
     >
       <CardActionArea onClick={() => viewHandler(post)}>
@@ -84,7 +103,7 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
             component="img"
             src={image}
             alt={name}
-            sx={{ width: '100%', height: 200, borderRadius: 5 }}
+            sx={{ width: '100%', height: 200, borderRadius: 2 }}
           />
         )}
       </CardActionArea>
@@ -105,13 +124,6 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
         >
           {name}
         </Typography>
-        <Typography
-          variant="subtitle1"
-          fontSize={16}
-          sx={{ mt: 2, color: 'text.secondary' }}
-        >
-          {desc}
-        </Typography>
       </CardContent>
 
       {/* Admin tools */}
@@ -122,17 +134,25 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
           }}
         >
           <GrowthBox />
-          <SquareIconButton
-            size="small"
-            color="error"
-            onClick={() => removeHandler(post.sectionId, post.id)}
-          >
-            <Delete />
-          </SquareIconButton>
+          <Tooltip title="Remove post">
+            <SquareIconButton
+              size="small"
+              color="error"
+              onClick={() => removeHandler(post.sectionId, post.id)}
+            >
+              <Delete />
+            </SquareIconButton>
+          </Tooltip>
 
-          <SquareIconButton size="small" color="primary" onClick={editHandler}>
-            <Edit />
-          </SquareIconButton>
+          <Tooltip title="Edit post">
+            <SquareIconButton
+              size="small"
+              color="primary"
+              onClick={editHandler}
+            >
+              <Edit />
+            </SquareIconButton>
+          </Tooltip>
         </CardActions>
       )}
     </Card>

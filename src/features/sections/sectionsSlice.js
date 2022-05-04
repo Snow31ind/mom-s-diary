@@ -9,6 +9,13 @@ import {
   updatePostById,
   updateSection,
 } from '../../thunks/sections';
+import { toast } from 'react-toastify';
+import { TOAST_LOADING } from '../../constants/toast';
+import {
+  postCreatedMessage,
+  postUpdatedMessage,
+  sectionUpdatedMessage,
+} from '../../toasts/messageCreator';
 
 const initialState = {
   sections: [],
@@ -45,7 +52,6 @@ const sectionsSlice = createSlice({
       state.status = 'succeeded';
       state.sections = action.payload;
       state.loading = false;
-      // state.status = 'success';
     },
     [fetchSections.rejected]: (state, action) => {
       state.status = 'failed';
@@ -53,21 +59,12 @@ const sectionsSlice = createSlice({
       state.loading = false;
     },
 
-    // [fetchSectionBySlug.pending]: (state) => {
-    //   state.loading = true;
-    // },
-    // [fetchSectionBySlug.fulfilled]: (state, action) => {
-    //   state.section = action.payload;
-    //   state.sections = [...state.sections, action.payload];
-    //   state.loading = false;
-    // },
-    // [fetchSectionBySlug.rejected]: (state, action) => {
-    //   state.error = action.payload;
-    //   state.loading = false;
-    // },
-
     [createPost.pending]: (state) => {
       state.loading = true;
+
+      toast.loading('Creating new post', {
+        toastId: TOAST_LOADING,
+      });
     },
     [createPost.fulfilled]: (state, action) => {
       const post = action.payload;
@@ -86,6 +83,10 @@ const sectionsSlice = createSlice({
       );
 
       state.loading = false;
+
+      toast.success(postCreatedMessage(correspondingSection.title, post), {
+        onOpen: (props) => toast.dismiss(TOAST_LOADING),
+      });
     },
     [createPost.rejected]: (state, action) => {
       state.error = action.payload;
@@ -94,6 +95,10 @@ const sectionsSlice = createSlice({
 
     [updatePostById.pending]: (state) => {
       state.loading = true;
+
+      toast.loading('Updating post', {
+        toastId: TOAST_LOADING,
+      });
     },
     [updatePostById.fulfilled]: (state, action) => {
       state.loading = false;
@@ -114,6 +119,13 @@ const sectionsSlice = createSlice({
       state.sections = state.sections.map((section) =>
         section.id !== updatedSection.id ? section : updatedSection
       );
+
+      toast.success(
+        postUpdatedMessage(correspondingSection.title, updatedPost),
+        {
+          onOpen: (props) => toast.dismiss(TOAST_LOADING),
+        }
+      );
     },
     [updatePostById.rejected]: (state, action) => {
       state.error = action.payload;
@@ -122,12 +134,20 @@ const sectionsSlice = createSlice({
 
     [createSection.pending]: (state) => {
       state.loading = true;
+
+      toast.loading('Creating new section', {
+        toastId: TOAST_LOADING,
+      });
     },
     [createSection.fulfilled]: (state, action) => {
       const section = action.payload;
 
       state.loading = false;
       state.sections = [...state.sections, section];
+
+      toast.success(postUpdatedMessage(updatedPost), {
+        onOpen: (props) => toast.dismiss(TOAST_LOADING),
+      });
     },
     [createSection.rejected]: (state, action) => {
       state.error = action.payload;
@@ -136,33 +156,28 @@ const sectionsSlice = createSlice({
 
     [removePost.pending]: (state) => {
       state.loading = true;
+
+      toast.loading('Removing post', {
+        toastId: TOAST_LOADING,
+      });
     },
     [removePost.fulfilled]: (state, action) => {
       state.loading = false;
 
       const { sectionId, id } = action.payload;
-      // console.log(sectionId, id);
 
-      const correspondingSection = state.sections.find(
-        (section) => section.id === sectionId
-      );
+      state.sections = state.sections.map((section) => {
+        if (section.id !== sectionId) {
+          return section;
+        } else {
+          const posts = section.posts.filter((post) => post.id !== id);
+          return { ...section, posts };
+        }
+      });
 
-      if (correspondingSection.posts.length > 1) {
-        const newSection = {
-          ...correspondingSection,
-          posts: correspondingSection.posts.filter((post) => post.id !== id),
-        };
-
-        // console.log(newSection);
-
-        state.sections = state.sections.map((section) =>
-          section.id !== sectionId ? section : newSection
-        );
-      } else {
-        state.sections = state.sections.filter(
-          (section) => section.id !== sectionId
-        );
-      }
+      toast.success('Post removed', {
+        onOpen: (props) => toast.dismiss(TOAST_LOADING),
+      });
     },
     [removePost.rejected]: (state, action) => {
       state.error = action.payload;
@@ -171,11 +186,19 @@ const sectionsSlice = createSlice({
 
     [removeSection.pending]: (state) => {
       state.loading = true;
+
+      toast.loading('Removing post', {
+        toastId: TOAST_LOADING,
+      });
     },
     [removeSection.fulfilled]: (state, action) => {
       const id = action.payload;
       state.loading = false;
       state.sections = state.sections.filter((section) => section.id !== id);
+
+      toast.success('Section removed', {
+        onOpen: (props) => toast.dismiss(TOAST_LOADING),
+      });
     },
     [removeSection.rejected]: (state, action) => {
       state.error = action.payload;
@@ -183,6 +206,10 @@ const sectionsSlice = createSlice({
     },
     [updateSection.pending]: (state) => {
       state.loading = true;
+
+      toast.loading('Updating section', {
+        toastId: TOAST_LOADING,
+      });
     },
     [updateSection.fulfilled]: (state, action) => {
       state.loading = false;
@@ -194,6 +221,10 @@ const sectionsSlice = createSlice({
           ? section
           : { ...section, ...updatedSection }
       );
+
+      toast.success(sectionUpdatedMessage(updatedSection), {
+        onOpen: (props) => toast.dismiss(TOAST_LOADING),
+      });
     },
     [updateSection.rejected]: (state, action) => {
       state.error = action.payload;

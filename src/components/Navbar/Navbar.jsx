@@ -60,13 +60,13 @@ const Navbar = () => {
       <AppBar>
         <Toolbar>
           <Link href="/">
-            <Typography color="secondary.main" fontFamily="Helvetica">
+            <Typography color="white" fontSize={20} fontFamily="Helvetica">
               {"Mom's diary"}
             </Typography>
           </Link>
           <GrowthBox />
           {!info ? (
-            <Button variant="outlined" onClick={signInHandler} color="inherit">
+            <Button variant="text" onClick={signInHandler} color="inherit">
               LOGIN
             </Button>
           ) : isAdmin ? (
@@ -126,6 +126,7 @@ const Navbar = () => {
         </Toolbar>
       </AppBar>
 
+      {/* Login modal */}
       <Modal open={loginModal} onClose={closeLoginModalHandler}>
         <Box
           sx={{

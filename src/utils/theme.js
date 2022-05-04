@@ -1,18 +1,23 @@
 import { createTheme, responsiveFontSizes, Typography } from '@mui/material';
-import { orange, pink } from '@mui/material/colors';
+import { blue, orange, pink } from '@mui/material/colors';
 
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#123456',
-    },
-    secondary: {
-      main: pink[400],
-    },
-    contrastThreshold: 3,
-    status: {
-      danger: orange[500],
+const muiTheme = createTheme();
+
+const theme = createTheme(muiTheme, {
+  components: {
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          color: muiTheme.palette.text.disabled,
+          '&:hover': {
+            backgroundColor: pink[100],
+          },
+          '&.Mui-selected': {
+            color: muiTheme.palette.text.primary,
+            backgroundColor: blue[100],
+          },
+        },
+      },
     },
   },
 });

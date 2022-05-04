@@ -11,9 +11,6 @@ import {
   CardMedia,
   Typography,
 } from '@mui/material';
-import { slugify } from '../../utils/helpers';
-import { useEffect } from 'react';
-import { fetchSections } from '../../thunks/sections';
 import { NavigateNext } from '@mui/icons-material';
 import {
   selectPostBySlug,

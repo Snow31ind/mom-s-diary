@@ -2,12 +2,12 @@ import { Box, Grid, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import Dashboard from '../../components/Dashboard/Dashboard';
 import Layout from '../../components/Layouts/Layout';
 import { DataGrid } from '@mui/x-data-grid';
 import SectionDataGrid from '../../components/DataGrid/SectionDataGrid/SectionDataGrid';
 import PostDataGrid from '../../components/DataGrid/PostDataGrid/PostDataGrid';
 import { selectIsAdmin } from '../../features/user/selector';
+import SideBar from '../../components/SideBar/SideBar';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -19,10 +19,6 @@ const Admin = () => {
       navigate('/handbook', { replace: true });
     }
   }, [isAdmin]);
-
-  const func = () => {
-    return <Typography>Hi</Typography>;
-  };
 
   const renderComponent = (selectedSection) => {
     if (selectedSection === 'sections') {
@@ -40,17 +36,14 @@ const Admin = () => {
 
   return (
     <Layout fullWidth>
-      {/* <Outlet /> */}
-      <Box sx={{ flexDirection: 'row' }}>
-        <Grid container spacing={2}>
-          <Grid item sm={3} md={3} xl={2}>
-            <Dashboard selectedSection={selectedSection} />
-          </Grid>
-          <Grid item sm={9} md={9} xl={10}>
-            {renderComponent(selectedSection)}
-          </Grid>
+      <Grid container spacing={1}>
+        <Grid item sm={3} md={3} xl={2}>
+          <SideBar selectedSection={selectedSection} />
         </Grid>
-      </Box>
+        <Grid item sm={9} md={9} xl={10}>
+          {renderComponent(selectedSection)}
+        </Grid>
+      </Grid>
     </Layout>
   );
 };

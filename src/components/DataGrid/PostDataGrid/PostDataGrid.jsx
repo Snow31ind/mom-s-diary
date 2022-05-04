@@ -1,14 +1,17 @@
 import { Add, Delete, Edit } from '@mui/icons-material';
-import { Box, LinearProgress, Modal, Stack } from '@mui/material';
+import { Box, LinearProgress, Modal, Stack, Tooltip } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbar } from '@mui/x-data-grid';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { clearPost, setPost } from '../../../features/sections/sectionsSlice';
 import {
   selectLoading,
   selectSections,
   selectSectionTypes,
 } from '../../../features/sections/selector';
+import { removePost } from '../../../thunks/sections';
+import { slugify } from '../../../utils/helpers';
 import GrowthBox from '../../GrowthBox/GrowthBox';
 import PostForm from '../../PostForm/PostForm';
 import CustomNoRowsOverlay from '../../Styled/CustomNoRowsOverlay';
@@ -19,6 +22,7 @@ const PostDataGrid = () => {
   const loading = useSelector(selectLoading());
   const sections = useSelector(selectSections());
   const types = useSelector(selectSectionTypes());
+
   const posts = sections
     .map((section) =>
       section.posts.map((post) => ({ ...post, sectionTitle: section.title }))
@@ -36,6 +40,21 @@ const PostDataGrid = () => {
       flex: 1,
       description: 'Post ID',
       renderHeader: () => <strong>ID</strong>,
+      renderCell: (params) => (
+        <Link
+          to={`/handbook/${slugify(params.row.sectionTitle)}/${slugify(
+            params.row.name
+          )}`}
+        >
+          {params.value}
+        </Link>
+      ),
+    },
+    {
+      field: 'sectionId',
+      flex: 1,
+      description: 'Section ID',
+      renderHeader: () => <strong>Section ID</strong>,
     },
     {
       field: 'sectionTitle',
@@ -103,7 +122,12 @@ const PostDataGrid = () => {
           showInMenu
           label="Remove"
           icon={<Delete />}
-          onClick={() => {}}
+          onClick={() => {
+            // console.log(params.row.sectionId, params.id);
+            dispatch(
+              removePost({ sectionId: params.row.sectionId, id: params.id })
+            );
+          }}
         />,
       ],
     },
@@ -119,13 +143,16 @@ const PostDataGrid = () => {
         <Stack direction="row">
           <GrowthBox />
           <Box>
-            <SquareIconButton onClick={createNewPostHandler}>
-              <Add />
-            </SquareIconButton>
+            <Tooltip title="New post">
+              <SquareIconButton size="small" onClick={createNewPostHandler}>
+                <Add />
+              </SquareIconButton>
+            </Tooltip>
           </Box>
         </Stack>
         <DataGrid
           autoHeight
+          rowsPerPageOptions={[5, 10, 25, 50, 100]}
           loading={loading}
           columns={columns}
           rows={posts}
@@ -137,12 +164,14 @@ const PostDataGrid = () => {
           initialState={{
             columns: {
               columnVisibilityModel: {
-                id: false,
+                // id: false,
+                sectionId: false,
                 createdAt: false,
                 updatedAt: false,
               },
             },
           }}
+          sx={{ mt: 2 }}
         />
       </Box>
 

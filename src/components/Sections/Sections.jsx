@@ -1,5 +1,16 @@
 import { Add } from '@mui/icons-material';
-import { Box, Checkbox, Fab, Modal, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogTitle,
+  Fab,
+  Modal,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -13,6 +24,7 @@ import LoadingSection from '../Loading/LoadingSection';
 import SectionForm from '../SectionForm/SectionForm';
 import SquareIconButton from '../Styled/SquareIconButton';
 import Section from './Section/Section';
+import { useNavigate } from 'react-router-dom';
 
 const Sections = (props) => {
   const sections = useSelector(selectSections());
@@ -21,43 +33,41 @@ const Sections = (props) => {
 
   const [openSectionForm, setOpenSectionForm] = useState(false);
 
+  const navigate = useNavigate();
+
   return (
     <React.Fragment>
       <Box>
         {isAdmin && (
           <Stack direction="row">
             <GrowthBox />
-            <SquareIconButton
-              variant="contained"
-              size="small"
-              color="inherit"
-              onClick={() => setOpenSectionForm(true)}
-            >
-              <Add />
-            </SquareIconButton>
+            <Tooltip title="New section">
+              <SquareIconButton
+                variant="contained"
+                size="small"
+                color="inherit"
+                onClick={() => setOpenSectionForm(true)}
+              >
+                <Add />
+              </SquareIconButton>
+            </Tooltip>
           </Stack>
         )}
-        {loading ? (
-          <>
-            {/* Loading Posts */}
-            {Array(1, 2, 3).map((e) => (
-              <LoadingSection key={e} />
-            ))}
-          </>
-        ) : (
-          <>
-            {/* Posts loaded */}
-            {sections.map((section, index) => (
+
+        {loading && Array(1, 2, 3).map((e) => <LoadingSection key={e} />)}
+        {!loading &&
+          sections
+            .filter((section) => section.posts.length)
+            .map((section, index) => (
               <Section
                 key={section.title}
                 section={section}
                 isLast={index === sections.length - 1}
               />
             ))}
-          </>
-        )}
       </Box>
 
+      {/* Section form */}
       <Modal open={openSectionForm} onClose={() => setOpenSectionForm(false)}>
         <Box
           sx={{

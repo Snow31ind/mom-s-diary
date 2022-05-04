@@ -12,7 +12,6 @@ import Layout from '../../components/Layouts/Layout';
 import { useDispatch, useSelector } from 'react-redux';
 import PostListItem from '../../components/PostListItem/PostListItem';
 import { slugify } from '../../utils/helpers';
-import { fetchSectionBySlug, fetchSections } from '../../thunks/sections';
 import { NavigateNext } from '@mui/icons-material';
 import { selectSectionBySlug } from '../../features/sections/selector';
 
