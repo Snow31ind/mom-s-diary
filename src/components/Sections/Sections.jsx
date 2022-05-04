@@ -74,7 +74,6 @@ const Sections = (props) => {
             left: '50%',
             transform: 'translate(-50%, -35%)',
             width: 800,
-            minHeight: '60vh',
             bgcolor: 'background.paper',
             border: '2px solid #000',
             boxShadow: 24,

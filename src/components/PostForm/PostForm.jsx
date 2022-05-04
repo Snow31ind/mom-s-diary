@@ -114,7 +114,7 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography textAlign="center" variant="h6" fontWeight="500">
+      <Typography textAlign="center" variant="h6" fontWeight="bold">
         {isEditingPost && 'Update post'}
         {isCreatingPostWithinSection && 'New post'}
         {isCreatingPost && 'New post'}

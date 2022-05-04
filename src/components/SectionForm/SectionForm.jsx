@@ -13,6 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLoading, selectSection } from '../../features/sections/selector';
 import { createSection, updateSection } from '../../thunks/sections';
+import { slugify } from '../../utils/helpers';
 import GrowthBox from '../GrowthBox/GrowthBox';
 import defaultImage from '/images/memories.png';
 
@@ -23,6 +24,7 @@ const SectionForm = ({ action, closeHandler }) => {
     formState: { errors },
     setValue,
     register,
+    getValues,
   } = useForm();
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading());
@@ -109,6 +111,7 @@ const SectionForm = ({ action, closeHandler }) => {
               control={control}
               defaultValue={''}
               rules={{
+                required: true,
                 minLength: 1,
               }}
               render={({ field }) => (
@@ -150,7 +153,7 @@ const SectionForm = ({ action, closeHandler }) => {
                       fullWidth
                       multiline
                       variant="outlined"
-                      label="ID"
+                      label="Unique ID"
                       inputProps={{ type: 'text' }}
                       minRows={2}
                       maxRows={2}
