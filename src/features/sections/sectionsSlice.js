@@ -14,6 +14,7 @@ import { TOAST_LOADING } from '../../constants/toast';
 import {
   postCreatedMessage,
   postUpdatedMessage,
+  sectionCreatedMessage,
   sectionUpdatedMessage,
 } from '../../toasts/messageCreator';
 
@@ -145,7 +146,7 @@ const sectionsSlice = createSlice({
       state.loading = false;
       state.sections = [...state.sections, section];
 
-      toast.success(sectionUpdatedMessage(section), {
+      toast.success(sectionCreatedMessage(section), {
         onOpen: (props) => toast.dismiss(TOAST_LOADING),
       });
     },
