@@ -97,18 +97,6 @@ const Navbar = () => {
                   </ListItemIcon>
                   <Typography>Dashboard</Typography>
                 </MenuItem>
-                <MenuItem sx={{ display: 'flex' }}>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    display="flex"
-                    // bgcolor="gray"
-                    flex={1}
-                  >
-                    <DarkMode />
-                    <Switch sx={{}} label="Dark mode" />
-                  </Stack>
-                </MenuItem>
                 <Divider />
                 <MenuItem onClick={signOutHandler}>
                   <ListItemIcon>

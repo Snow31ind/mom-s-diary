@@ -45,7 +45,7 @@ const Sections = (props) => {
               <SquareIconButton
                 variant="contained"
                 size="small"
-                color="inherit"
+                color="success"
                 onClick={() => setOpenSectionForm(true)}
               >
                 <Add />
@@ -56,15 +56,13 @@ const Sections = (props) => {
 
         {loading && Array(1, 2, 3).map((e) => <LoadingSection key={e} />)}
         {!loading &&
-          sections
-            .filter((section) => section.posts.length)
-            .map((section, index) => (
-              <Section
-                key={section.title}
-                section={section}
-                isLast={index === sections.length - 1}
-              />
-            ))}
+          sections.map((section, index) => (
+            <Section
+              key={section.title}
+              section={section}
+              isLast={index === sections.length - 1}
+            />
+          ))}
       </Box>
 
       {/* Section form */}

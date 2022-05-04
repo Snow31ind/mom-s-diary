@@ -26,6 +26,11 @@ import { setSection } from '../../../features/sections/sectionsSlice';
 import CustomLinearProgress from '../../Styled/CustomLinearProgress';
 import SectionForm from '../../SectionForm/SectionForm';
 import { slugify } from '../../../utils/helpers';
+import {
+  createDialogState,
+  openDialog,
+  setDialog,
+} from '../../../features/dialog/dialogSlice';
 
 const SectionDataGrid = () => {
   const dispatch = useDispatch();
@@ -122,7 +127,20 @@ const SectionDataGrid = () => {
                 icon={<Delete />}
                 onClick={() => {
                   const id = params.id;
-                  dispatch(removeSection({ id }));
+
+                  dispatch(
+                    setDialog(
+                      createDialogState(
+                        'Section removal',
+                        'Are you sure you want to remove this section?',
+                        'Cancel',
+                        'Remove',
+                        () => dispatch(removeSection({ id }))
+                      )
+                    )
+                  );
+
+                  dispatch(openDialog());
                 }}
                 label="Delete"
               />

@@ -50,7 +50,7 @@ export const createPost = async (file, post) => {
     await uploadBytes(ref(storage, post.photo), file);
 
     // Fetch file from cloud storage
-    const image = await getImage(file.name);
+    const image = await getImage(post.photo);
 
     // console.log(data);
     const postRef = await addDoc(
@@ -110,8 +110,6 @@ export const fetchSections = async () => {
       const posts = await fetchPostsByType(section.id);
       data = [...data, { ...section, posts }];
     }
-
-    console.log(data);
 
     return data;
   } catch (error) {

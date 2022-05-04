@@ -68,7 +68,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
           <LockRounded />
         </Avatar>
         <Typography variant="h5" sx={{ mt: 1 }}>
-          {isSignIn ? 'Sign in' : 'Sign up'}
+          {isSignIn ? 'Admin' : 'Sign up'}
         </Typography>
       </Box>
 
@@ -179,7 +179,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
           </ListItem>
 
           {/* Switch mode */}
-          <ListItem>
+          {/* <ListItem>
             {isSignIn ? (
               <Link onClick={() => setIsSignIn(false)}>
                 <Typography>{"Don't have an account? Sign up"}</Typography>
@@ -189,7 +189,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
                 <Typography>{'Already have an account? Sign in'}</Typography>
               </Link>
             )}
-          </ListItem>
+          </ListItem> */}
         </List>
       </form>
     </Box>

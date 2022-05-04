@@ -77,21 +77,33 @@ const CustomSlider = ({ children, data, renderItem, renderKey }) => {
     afterChange: (current) => setActiveSlide(current),
   };
 
-  const isFirstSlideAppearing = Boolean(activeSlide === 0);
-  const isLastSlideAppearing = Boolean(
-    activeSlide === data.length - settings.slidesToShow
+  const isPrevAllowed = Boolean(activeSlide > 0);
+  const isNextAllowed = Boolean(
+    data.length > settings.slidesToShow
+      ? activeSlide + settings.slidesToShow < data.length
+      : false
   );
 
   return (
     <Stack direction="row" display="flex" mt={2}>
       <Box
-        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 40,
+        }}
       >
         <IconButton
-          disabled={isFirstSlideAppearing}
+          // disabled={isPrevAllowed}
           color="primary"
           onClick={() => slider.current.slickPrev()}
           size="small"
+          sx={{
+            ...(!isPrevAllowed && {
+              display: 'none',
+            }),
+          }}
         >
           <ChevronLeft fontSize="large" />
         </IconButton>
@@ -106,13 +118,23 @@ const CustomSlider = ({ children, data, renderItem, renderKey }) => {
         </Slider>
       </Box>
       <Box
-        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 40,
+        }}
       >
         <IconButton
-          disabled={isLastSlideAppearing}
+          // disabled={isNextAllowed}
           color="primary"
           onClick={() => slider.current.slickNext()}
           size="small"
+          sx={{
+            ...(!isNextAllowed && {
+              display: 'none',
+            }),
+          }}
         >
           <ChevronRight fontSize="large" />
         </IconButton>

@@ -4,6 +4,11 @@ import { DataGrid, GridActionsCellItem, GridToolbar } from '@mui/x-data-grid';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import {
+  createDialogState,
+  openDialog,
+  setDialog,
+} from '../../../features/dialog/dialogSlice';
 import { clearPost, setPost } from '../../../features/sections/sectionsSlice';
 import {
   selectLoading,
@@ -123,10 +128,25 @@ const PostDataGrid = () => {
           label="Remove"
           icon={<Delete />}
           onClick={() => {
-            // console.log(params.row.sectionId, params.id);
             dispatch(
-              removePost({ sectionId: params.row.sectionId, id: params.id })
+              setDialog(
+                createDialogState(
+                  'Post removal',
+                  'Are you sure you want to remove this post?',
+                  'Cancel',
+                  'Process',
+                  () =>
+                    dispatch(
+                      removePost({
+                        sectionId: params.row.sectionId,
+                        id: params.id,
+                      })
+                    )
+                )
+              )
             );
+
+            dispatch(openDialog());
           }}
         />,
       ],

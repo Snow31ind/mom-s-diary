@@ -33,6 +33,7 @@ import {
   closeDialog,
   createDialogState,
   onProcessWithDialog,
+  openDialog,
   setDialog,
 } from '../../../../features/dialog/dialogSlice';
 
@@ -58,14 +59,15 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
     dispatch(
       setDialog(
         createDialogState(
-          true,
           'Post removal',
           'Are you sure you want to remove this post?',
           'Cancel',
-          'Process'
+          'Process',
+          () => removeHandler(sectionId, id)
         )
       )
     );
+    dispatch(openDialog());
   };
 
   const editHandler = () => {
@@ -138,7 +140,7 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
             <SquareIconButton
               size="small"
               color="error"
-              onClick={() => removeHandler(post.sectionId, post.id)}
+              onClick={() => openDialogToRemoveHandler(post.sectionId, post.id)}
             >
               <Delete />
             </SquareIconButton>

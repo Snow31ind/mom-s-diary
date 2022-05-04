@@ -1,18 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export const createDialogState = (
-  open,
   title,
   message,
   onCancelText,
-  onProcessText
+  onProcessText,
+  onProcess
 ) => {
   return {
-    open,
     title,
     message,
     onCancelText,
     onProcessText,
+    onProcess,
   };
 };
 
@@ -22,6 +22,7 @@ const initialState = {
   message: '',
   onCancelText: '',
   onProcessText: '',
+  onProcess: () => {},
 };
 
 const dialogSlice = createSlice({
@@ -29,7 +30,7 @@ const dialogSlice = createSlice({
   initialState,
   reducers: {
     setDialog: (state, action) => {
-      const { open, title, message, onCancelText, onProcessText } =
+      const { open, title, message, onCancelText, onProcessText, onProcess } =
         action.payload;
 
       state.open = open;
@@ -37,6 +38,7 @@ const dialogSlice = createSlice({
       state.message = message;
       state.onCancelText = onCancelText;
       state.onProcessText = onProcessText;
+      state.onProcess = onProcess;
     },
     resetDialog: (state) => {
       state = initialState;
@@ -46,15 +48,13 @@ const dialogSlice = createSlice({
     },
     closeDialog: (state) => {
       state.open = false;
+    },
+    clearDialog: (state) => {
       state.title = '';
       state.message = '';
       state.onCancelText = '';
       state.onProcessText = '';
-    },
-    onProcessWithDialog: (state, action) => {
-      const onProcess = action.payload;
-
-      onProcess();
+      state.onProcess = () => {};
     },
   },
 });
@@ -65,6 +65,7 @@ export const {
   setDialog,
   resetDialog,
   onProcessWithDialog,
+  clearDialog,
 } = dialogSlice.actions;
 
 export default dialogSlice.reducer;

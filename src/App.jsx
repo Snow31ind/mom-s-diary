@@ -17,7 +17,6 @@ const App = () => {
   const status = useSelector(selectStatus());
 
   useEffect(() => {
-    console.log('Hello');
     dispatch(fetchSections());
   }, [dispatch]);
 

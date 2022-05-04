@@ -5,39 +5,49 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Slide,
 } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { closeDialog } from '../../features/dialog/dialogSlice';
+import { clearDialog, closeDialog } from '../../features/dialog/dialogSlice';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const CustomDialog = () => {
   const dispatch = useDispatch();
-  const { open, title, message, onCancelText, onProcessText } = useSelector(
-    (state) => state.dialog
-  );
+  const { open, title, message, onCancelText, onProcessText, onProcess } =
+    useSelector((state) => state.dialog);
 
   const closeHandler = () => {
+    dispatch(clearDialog());
     dispatch(closeDialog());
   };
 
   const processHandler = () => {
     console.log('Processed');
-    // onProcess();
-    dispatch(closeDialog());
+    onProcess();
+    closeHandler();
   };
 
   return (
-    <Dialog open={open} onClose={closeHandler}>
+    <Dialog
+      keepMounted
+      open={open}
+      onClose={closeHandler}
+      TransitionComponent={Transition}
+    >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button color="warning" variant="outlined" onClick={closeHandler}>
+        <Button color="warning" variant="text" onClick={closeHandler}>
           {onCancelText}
         </Button>
 
-        <Button color="primary" variant="outlined" onClick={processHandler}>
+        <Button color="primary" variant="text" onClick={processHandler}>
           {onProcessText}
         </Button>
       </DialogActions>

@@ -21,7 +21,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import GrowthBox from '../../GrowthBox/GrowthBox';
 import PostCard from './PostCard/PostCard';
-import { Add, Delete, Edit, Hexagon } from '@mui/icons-material';
+import { Add, Bookmark, Delete, Edit, Hexagon } from '@mui/icons-material';
 import { removeSection } from '../../../thunks/sections';
 import { Link, useNavigate } from 'react-router-dom';
 import { slugify } from '../../../utils/helpers';
@@ -75,7 +75,6 @@ const Section = ({ section, isLast }) => {
   const onClosePostFormHandler = () => {
     dispatch(clearPost());
     dispatch(clearSection());
-    console.log('Close modal');
 
     setOpenPostForm(false);
   };
@@ -89,7 +88,8 @@ const Section = ({ section, isLast }) => {
     <>
       <Box sx={{ mt: 2 }}>
         <Stack direction="row">
-          <Stack>
+          <Stack direction="row" alignItems="center" justifyContent="center">
+            <Bookmark color="primary" />
             <Link
               // underline="hover"
               to={`/handbook/${slugify(section.title)}`}
@@ -144,17 +144,32 @@ const Section = ({ section, isLast }) => {
           )}
         </Stack>
 
-        <CustomSlider
-          data={posts}
-          renderItem={(post) => (
-            <PostCard
-              post={post}
-              type={section.title}
-              openPostFormModalHandler={openEditPostFormModalHandler}
-            />
-          )}
-          renderKey={(post) => post.id}
-        ></CustomSlider>
+        {posts.length ? (
+          <CustomSlider
+            data={posts}
+            renderItem={(post) => (
+              <PostCard
+                post={post}
+                type={section.title}
+                openPostFormModalHandler={openEditPostFormModalHandler}
+              />
+            )}
+            renderKey={(post) => post.id}
+          ></CustomSlider>
+        ) : (
+          <Box
+            sx={{
+              height: 150,
+              flex: 1,
+              // bgcolor: 'gray',
+              justifyContent: 'center',
+              alignItems: 'center',
+              display: 'flex',
+            }}
+          >
+            <Typography>No post is available</Typography>
+          </Box>
+        )}
 
         {!isLast && (
           <Divider textAlign="center" sx={{ mt: 4 }}>
