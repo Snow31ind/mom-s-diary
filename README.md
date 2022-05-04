@@ -1,5 +1,5 @@
 # Mom's Diary: web-based application
-* [Deployed URL](https://mom-s-diary-7ep35aivm-snow31ind.vercel.app/)
+* [Deployed URL](https://mom-s-diary.vercel.app/)
 
 ## Table of contents
 1. [Introduction](#introduction)
