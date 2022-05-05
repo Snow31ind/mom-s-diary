@@ -61,7 +61,7 @@ const Navbar = () => {
         <Toolbar>
           <Link href="/">
             <Typography color="white" fontSize={20} fontFamily="Helvetica">
-              {"Mom's diary"}
+              {'Nhật kí của mẹ'}
             </Typography>
           </Link>
           <GrowthBox />

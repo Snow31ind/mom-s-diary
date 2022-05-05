@@ -79,6 +79,6 @@ export const updateSection = createAsyncThunk(
 
     const updatedSection = await api.updateSection(id, section);
 
-    return updatedSection;
+    return { updatedSection, oldSectionId: id };
   }
 );

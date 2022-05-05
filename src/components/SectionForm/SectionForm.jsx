@@ -13,6 +13,8 @@ import React from 'react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { clearSection } from '../../features/sections/sectionsSlice';
 import { selectLoading, selectSection } from '../../features/sections/selector';
 import { createSection, updateSection } from '../../thunks/sections';
 import { slugify } from '../../utils/helpers';
@@ -51,14 +53,20 @@ const SectionForm = ({ action, closeHandler }) => {
         photo: file.name,
       };
 
-      dispatch(createSection({ section, id, file }));
+      dispatch(createSection({ section, id: slugify(title), file }));
       clearForm();
       closeHandler();
     } else if (isUpdatingSection) {
-      const section = {
-        title,
-      };
-      dispatch(updateSection({ section, id }));
+      if (title !== section.title) {
+        const newSection = {
+          title,
+        };
+
+        dispatch(updateSection({ section: newSection, id }));
+      } else {
+        toast.warning('Thay đổi nội dung khi cập nhật danh mục');
+      }
+
       clearForm();
       closeHandler();
     }
@@ -137,42 +145,9 @@ const SectionForm = ({ action, closeHandler }) => {
             />
           </ListItem>
 
-          {/* Type & name */}
+          {/* Name */}
           {isCreatingSection && (
             <React.Fragment>
-              <ListItem>
-                <Controller
-                  name="id"
-                  control={control}
-                  defaultValue={''}
-                  rules={{
-                    required: true,
-                    minLength: 1,
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      autoFocus
-                      fullWidth
-                      multiline
-                      variant="outlined"
-                      label="ID cho danh mục"
-                      inputProps={{ type: 'text' }}
-                      minRows={2}
-                      maxRows={2}
-                      error={Boolean(errors.id)}
-                      helperText={
-                        errors.id
-                          ? errors.id.type === 'minLength'
-                            ? 'ID is invalid'
-                            : 'ID is required'
-                          : ''
-                      }
-                      {...field}
-                    />
-                  )}
-                />
-              </ListItem>
-
               <ListItem>
                 <Controller
                   name="name"
@@ -241,8 +216,11 @@ const SectionForm = ({ action, closeHandler }) => {
         </List>
       </form>
 
-      <IconButton onClick={closeHandler} sx={{ position: 'absolute' }}>
-        <Close color="action" fontSize="small" />
+      <IconButton
+        onClick={closeHandler}
+        sx={{ position: 'absolute', right: 15, top: 15 }}
+      >
+        <Close color="error" fontSize="small" />
       </IconButton>
     </Box>
   );

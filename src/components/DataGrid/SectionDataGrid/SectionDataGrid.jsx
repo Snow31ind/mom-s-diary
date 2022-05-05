@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectSections } from '../../../features/sections/selector';
 import { DataGrid, GridActionsCellItem, GridToolbar } from '@mui/x-data-grid';
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
@@ -15,7 +16,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Add, Delete, Edit } from '@mui/icons-material';
+import { Add, Delete, Edit, Person } from '@mui/icons-material';
 import { selectLoading } from '../../../features/sections/selector';
 import SquareIconButton from '../../Styled/SquareIconButton';
 import GrowthBox from '../../GrowthBox/GrowthBox';
@@ -49,9 +50,8 @@ const SectionDataGrid = () => {
   const columns = [
     {
       field: 'id',
-      // headerName: 'Section ID',
+      headerName: 'ID',
       flex: 1,
-      description: 'ID của danh mục',
       // valueFormatter: (params) => `${params.value}`,
       renderHeader: (params) => <strong>{'ID'}</strong>,
       renderCell: (params) => (
@@ -62,43 +62,42 @@ const SectionDataGrid = () => {
     },
     {
       field: 'title',
-      // headerName: 'Section title',
+      headerName: 'Tiêu đề',
       flex: 1,
       description: 'Tiêu đề danh mục',
       // editable: true,
-      valueFormatter: (params) => `${params.value}`,
       renderHeader: (params) => <strong>{'Tiêu đề'}</strong>,
+      valueFormatter: (params) => `${params.value}`,
     },
     {
       field: 'count',
-      // headerName: 'Number of posts',
+      headerName: 'Số lượng bài viết',
       flex: 1,
       type: 'number',
-      description: 'Số lượng bài viết',
       valueGetter: (params) => `${params.row.posts.length}`,
-      renderHeader: (params) => <strong>{'Bài viết'}</strong>,
+      renderHeader: (params) => <strong>{'Số lượng bài viết'}</strong>,
     },
     {
       field: 'createdAt',
-      // headerName: 'Published',
+      headerName: 'Ngày khởi tạo',
       flex: 1,
       type: 'date',
-      description: 'Ngày danh mục được khởi tạo',
       valueFormatter: (params) =>
         `${new Date(params.value).toLocaleDateString()}`,
       renderHeader: (params) => <strong>{'Ngày khởi tạo'}</strong>,
     },
     {
       field: 'updatedAt',
-      // headerName: 'Last updated',
+      headerName: 'Lần cập nhật gần nhất',
       flex: 1,
       type: 'date',
-      description: 'Ngày danh mục được cập nhật',
       valueFormatter: (params) => `${new Date(params.value).toLocaleString()}`,
       renderHeader: (params) => <strong>{'Lần cập nhật gần nhất'}</strong>,
     },
     {
       field: 'actions',
+      headerName: 'Thao tác',
+      renderHeader: (params) => <strong>{'Thao tác'}</strong>,
       flex: 1,
       type: 'actions',
       getActions: (params) => {
@@ -176,9 +175,76 @@ const SectionDataGrid = () => {
 
         <DataGrid
           autoHeight
-          // hideFooter
-          // checkboxSelection
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          pagination
+          rowsPerPageOptions={[10, 25, 100]}
+          localeText={{
+            noRowsLabel: 'Dữ liệu không tồn tại',
+            noResultsOverlayLabel: 'Không tồn tại dữ liệu cần tìm kiếm',
+            errorOverlayDefaultLabel: 'Lỗi',
+
+            toolbarColumns: 'Ẩn/hiện cột',
+            toolbarColumnsLabel: 'Ẩn/hiện cột',
+            columnsPanelTextFieldLabel: 'Tìm kiếm cột',
+            columnsPanelTextFieldPlaceholder: 'Tên cột',
+            columnsPanelDragIconLabel: 'Reorder column',
+            columnsPanelShowAllButton: 'Hiện tất cả',
+            columnsPanelHideAllButton: 'Che tất cả',
+
+            toolbarFilters: 'Lọc',
+            toolbarFiltersLabel: 'Lọc',
+            toolbarFiltersTooltipActive: (count) =>
+              count !== 1 ? `${count} bộ lọc` : `${count} bộ lọc`,
+
+            toolbarDensity: 'Kiêu hiện thị',
+            toolbarDensityLabel: 'Kiêu hiện thị',
+            toolbarDensityCompact: 'Hẹp',
+            toolbarDensityStandard: 'Tương đối',
+            toolbarDensityComfortable: 'Rộng',
+
+            toolbarExport: 'Xuất',
+            toolbarExportLabel: 'Xuất',
+            toolbarExportCSV: 'Format CSV',
+            toolbarExportPrint: 'In',
+
+            filterPanelAddFilter: 'Thêm bộ lọc',
+            filterPanelDeleteIconLabel: 'Xóa',
+            filterPanelLinkOperator: 'Quan hệ logic',
+            filterPanelOperators: 'Quan hệ', // TODO v6: rename to filterPanelOperator
+            filterPanelOperatorAnd: 'Và',
+            filterPanelOperatorOr: 'Hoặc',
+            filterPanelColumns: 'Cột',
+            filterPanelInputLabel: 'Giá trị',
+            filterPanelInputPlaceholder: 'Giá trị để lọc',
+
+            filterOperatorContains: 'Chứa',
+            filterOperatorEquals: 'Bằng',
+            filterOperatorStartsWith: 'Băt đầu với',
+            filterOperatorEndsWith: 'Kết thúc với',
+            filterOperatorIs: 'Là',
+            filterOperatorNot: 'Không phải là',
+            filterOperatorAfter: 'Sau khi',
+            filterOperatorOnOrAfter: 'Kể từ khi',
+            filterOperatorBefore: 'Trước khi',
+            filterOperatorOnOrBefore: 'Kể từ trước khi',
+            filterOperatorIsEmpty: 'Rỗng',
+            filterOperatorIsNotEmpty: 'Không rỗng',
+            filterOperatorIsAnyOf: 'Là bất kì',
+
+            columnMenuLabel: 'Menu',
+            columnMenuShowColumns: 'Bật ẩn/hiện cột',
+            columnMenuFilter: 'Bật bộ lọc',
+            columnMenuHideColumn: 'Ẩn',
+            columnMenuUnsort: 'Không sắp xếp',
+            columnMenuSortAsc: 'Sắp xếp tăng dần',
+            columnMenuSortDesc: 'Sắp xếp giảm dần',
+
+            columnHeaderSortIconLabel: 'Sắp xếp',
+
+            footerRowSelected: (count) =>
+              count !== 1
+                ? `${count.toLocaleString()} dòng được chọn`
+                : `${count.toLocaleString()} dòng được chọn`,
+          }}
           loading={loading}
           columns={columns}
           rows={sections}
@@ -187,6 +253,7 @@ const SectionDataGrid = () => {
             LoadingOverlay: CustomLinearProgress,
             NoRowsOverlay: CustomNoRowsOverlay,
           }}
+          componentsProps={{}}
           initialState={{
             columns: {
               columnVisibilityModel: {

@@ -17,6 +17,7 @@ import {
   sectionCreatedMessage,
   sectionUpdatedMessage,
 } from '../../toasts/messageCreator';
+import { gridColumnsTotalWidthSelector } from '@mui/x-data-grid';
 
 const initialState = {
   sections: [],
@@ -63,7 +64,7 @@ const sectionsSlice = createSlice({
     [createPost.pending]: (state) => {
       state.loading = true;
 
-      toast.loading('Creating new post', {
+      toast.loading('Tạo bài học mới', {
         toastId: TOAST_LOADING,
       });
     },
@@ -97,7 +98,7 @@ const sectionsSlice = createSlice({
     [updatePostById.pending]: (state) => {
       state.loading = true;
 
-      toast.loading('Updating post', {
+      toast.loading('Cập nhật bài học', {
         toastId: TOAST_LOADING,
       });
     },
@@ -136,7 +137,7 @@ const sectionsSlice = createSlice({
     [createSection.pending]: (state) => {
       state.loading = true;
 
-      toast.loading('Creating new section', {
+      toast.loading('Tạo danh mục mới', {
         toastId: TOAST_LOADING,
       });
     },
@@ -158,7 +159,7 @@ const sectionsSlice = createSlice({
     [removePost.pending]: (state) => {
       state.loading = true;
 
-      toast.loading('Removing post', {
+      toast.loading('Xóa bài học', {
         toastId: TOAST_LOADING,
       });
     },
@@ -176,7 +177,7 @@ const sectionsSlice = createSlice({
         }
       });
 
-      toast.success('Post removed', {
+      toast.success('Bài học đã được xóa', {
         onOpen: (props) => toast.dismiss(TOAST_LOADING),
       });
     },
@@ -188,7 +189,7 @@ const sectionsSlice = createSlice({
     [removeSection.pending]: (state) => {
       state.loading = true;
 
-      toast.loading('Removing post', {
+      toast.loading('Xóa danh mục', {
         toastId: TOAST_LOADING,
       });
     },
@@ -197,7 +198,7 @@ const sectionsSlice = createSlice({
       state.loading = false;
       state.sections = state.sections.filter((section) => section.id !== id);
 
-      toast.success('Section removed', {
+      toast.success('Danh mục đã dược xóa', {
         onOpen: (props) => toast.dismiss(TOAST_LOADING),
       });
     },
@@ -208,19 +209,17 @@ const sectionsSlice = createSlice({
     [updateSection.pending]: (state) => {
       state.loading = true;
 
-      toast.loading('Updating section', {
+      toast.loading('Cập nhật danh mục', {
         toastId: TOAST_LOADING,
       });
     },
     [updateSection.fulfilled]: (state, action) => {
       state.loading = false;
 
-      const updatedSection = action.payload;
+      const { updatedSection, oldSectionId } = action.payload;
 
       state.sections = state.sections.map((section) =>
-        section.id !== updatedSection.id
-          ? section
-          : { ...section, ...updatedSection }
+        section.id !== oldSectionId ? section : updatedSection
       );
 
       toast.success(sectionUpdatedMessage(updatedSection), {

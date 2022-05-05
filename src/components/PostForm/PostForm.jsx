@@ -18,6 +18,7 @@ import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { clearPost } from '../../features/sections/sectionsSlice';
 import {
   selectLoading,
   selectPost,
@@ -30,7 +31,7 @@ import GrowthBox from '../GrowthBox/GrowthBox';
 import defaultImage from '/images/memories.png';
 
 // action = "create" | "update" | "createWithinSection"
-const PostForm = ({ closePostFormModalHandler, action }) => {
+const PostForm = ({ closeHandler, action }) => {
   const dispatch = useDispatch();
 
   const sections = useSelector(selectSections());
@@ -89,7 +90,7 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
       dispatch(createPost({ file, data }));
     }
 
-    closePostFormModalHandler();
+    closeHandler();
     clearHandler();
   };
 
@@ -117,9 +118,9 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <Typography textAlign="center" variant="h6" fontWeight="bold">
-        {isEditingPost && 'Cập nhật bài viết'}
-        {isCreatingPostWithinSection && 'Bài viết mới'}
-        {isCreatingPost && 'Bài viết mới'}
+        {isEditingPost && 'Cập nhật bài học'}
+        {isCreatingPostWithinSection && 'Bài học mới'}
+        {isCreatingPost && 'Bài học mới'}
       </Typography>
 
       <form onSubmit={handleSubmit(submitHandler)}>
@@ -170,14 +171,14 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
                   fullWidth
                   multiline
                   variant="outlined"
-                  label="Tên bài viết (bắt buộc)"
+                  label="Tên bài học"
                   inputProps={{ type: 'text' }}
                   error={Boolean(errors.name)}
                   helperText={
                     errors.name
                       ? errors.name.type === 'minLength'
-                        ? 'Name is invalid'
-                        : 'Name is required'
+                        ? 'Tên bài học không hợp lệ'
+                        : 'Tên bài học không được trống'
                       : ''
                   }
                   {...field}
@@ -204,14 +205,14 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
                   minRows={2}
                   maxRows={2}
                   variant="outlined"
-                  label="Miêu tả bài viết (bắt buộc)"
+                  label="Miêu tả bài học"
                   inputProps={{ type: 'text' }}
                   error={Boolean(errors.desc)}
                   helperText={
                     errors.desc
                       ? errors.desc.type === 'minLength'
-                        ? 'Description is invalid'
-                        : 'Description is required'
+                        ? 'Miêu tả bài học không hợp lệ'
+                        : 'Miêu tả bài học không được trống'
                       : ''
                   }
                   {...field}
@@ -238,14 +239,14 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
                   minRows={12}
                   maxRows={12}
                   variant="outlined"
-                  label="Nội dung bài viết (bắt buộc)"
+                  label="Nội dung bài học"
                   inputProps={{ type: 'text' }}
                   error={Boolean(errors.desc)}
                   helperText={
                     errors.content
                       ? errors.content.type === 'minLength'
-                        ? 'Content is invalid'
-                        : 'Content is required'
+                        ? 'Nội dung bài học không hợp lệ'
+                        : 'Nội dung bài học không được trống'
                       : ''
                   }
                   {...field}
@@ -287,10 +288,10 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
       </form>
 
       <IconButton
-        onClick={closePostFormModalHandler}
-        sx={{ position: 'absolute' }}
+        onClick={closeHandler}
+        sx={{ position: 'absolute', right: 15, top: 15 }}
       >
-        <Close color="action" fontSize="small" />
+        <Close color="error" fontSize="small" />
       </IconButton>
     </Box>
   );

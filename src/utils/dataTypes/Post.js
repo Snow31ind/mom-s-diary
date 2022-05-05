@@ -1,4 +1,4 @@
-import { serverTimestamp } from 'firebase/firestore';
+import { serverTimestamp, Timestamp } from 'firebase/firestore';
 
 class Post {
   constructor(content, desc, name, photo, sectionId, createdAt, updatedAt) {
@@ -21,7 +21,7 @@ export const postConverter = {
       photo: post.photo,
       sectionId: post.sectionId,
       createdAt: post.hasOwnProperty('createdAt')
-        ? post.createdAt
+        ? Timestamp.fromDate(new Date(post.createdAt))
         : serverTimestamp(),
       updatedAt: serverTimestamp(),
     };

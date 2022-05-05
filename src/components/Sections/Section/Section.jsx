@@ -91,8 +91,6 @@ const Section = ({ section, isLast }) => {
 
   const onClosePostFormHandler = () => {
     dispatch(clearPost());
-    dispatch(clearSection());
-
     setOpenPostForm(false);
   };
 
@@ -217,13 +215,13 @@ const Section = ({ section, isLast }) => {
         >
           {openPostForm && (
             <PostForm
-              closePostFormModalHandler={() => setOpenPostForm(false)}
+              closeHandler={onClosePostFormHandler}
               action={postFormAction}
             />
           )}
           {openSectionForm && (
             <SectionForm
-              closeHandler={() => setOpenSectionForm(false)}
+              closeHandler={onCloseSectionFormHandler}
               action="update"
             />
           )}

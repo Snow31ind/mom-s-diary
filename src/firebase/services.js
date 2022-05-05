@@ -18,11 +18,13 @@ import {
   getDoc,
   orderBy,
   updateDoc,
+  Firestore,
 } from 'firebase/firestore';
 import { postConverter } from '../utils/dataTypes/Post';
 import { sectionConverter } from '../utils/dataTypes/Section';
 import { auth, db, storage } from './config';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { slugify } from '../utils/helpers';
 
 export const fetchPostsByType = async (type) => {
   const querySnapshot = await getDocs(
@@ -149,16 +151,78 @@ export const removeSection = async (id) => {
 };
 
 export const updateSection = async (id, section) => {
-  await updateDoc(doc(db, 'handbook', id).withConverter(sectionConverter), {
-    ...section,
-    updatedAt: serverTimestamp(),
-  });
+  // Remove old collection
+  // Create new collection
+  // Put all previous docs in old collection into the new one
 
-  const updatedSection = await getDoc(
+  // Fetch old section
+  const oldSectionSnapshot = await getDoc(
     doc(db, 'handbook', id).withConverter(sectionConverter)
   );
 
-  return { ...updatedSection.data(), id };
+  const oldSection = {
+    id: oldSectionSnapshot.id,
+    ...oldSectionSnapshot.data(),
+  };
+
+  // Remove old section in collection handbook
+  await deleteDoc(doc(db, 'handbook', id));
+
+  // Add new section in collection handbook with slugified title
+  const { title } = section;
+  const newSectionId = slugify(title);
+
+  await setDoc(
+    doc(db, 'handbook', newSectionId).withConverter(sectionConverter),
+    {
+      ...oldSection,
+      ...section,
+    }
+  );
+
+  // Get all old posts in old section
+  const oldPostsSnapshot = await getDocs(
+    collection(db, oldSection.id).withConverter(postConverter)
+  );
+
+  const oldPosts = oldPostsSnapshot.docs.map((post) => ({
+    ...post.data(),
+    id: post.id,
+  }));
+
+  // Remove all posts in old collection secion
+  for (var oldPost of oldPosts) {
+    await deleteDoc(doc(db, oldPost.sectionId, oldPost.id));
+  }
+
+  // Update all posts with the field "sectionId"
+  const updatedPosts = oldPosts.map((post) => ({
+    ...post,
+    sectionId: newSectionId,
+  }));
+
+  // Add updated posts in a new collection section
+  for (var updatedPost of updatedPosts) {
+    await setDoc(
+      doc(db, newSectionId, updatedPost.id).withConverter(postConverter),
+      updatedPost
+    );
+  }
+
+  const updatedSection = fetchSectionById(newSectionId);
+
+  return updatedSection;
+};
+
+export const fetchSectionById = async (id) => {
+  const sectionSnapshot = await getDoc(
+    doc(db, 'handbook', id).withConverter(sectionConverter)
+  );
+  const section = { ...sectionSnapshot.data(), id: sectionSnapshot.id };
+
+  const posts = await fetchPostsByType(id);
+
+  return { ...section, posts };
 };
 
 export const signIn = async (user) => {

@@ -4,7 +4,7 @@ import Layout from '../../components/Layouts/Layout';
 import Sections from '../../components/Sections/Sections';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { Box, Card, CardContent, Typography } from '@mui/material';
+import { Box, Card, CardContent, Pagination, Typography } from '@mui/material';
 
 const Home = () => {
   return (

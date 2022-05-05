@@ -1,4 +1,4 @@
-import { Add } from '@mui/icons-material';
+import { Add, GifTwoTone } from '@mui/icons-material';
 import { Box, Button, Typography } from '@mui/material';
 import {
   GridToolbarColumnsButton,

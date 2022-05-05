@@ -12,9 +12,9 @@ export const postCreatedMessage = (sectionType, post) => {
         alignItems: 'center',
       }}
     >
-      <Typography>New post created</Typography>
+      <Typography>{'Bài học được tạo thành công'}</Typography>
       <Link to={`/handbook/${slugify(sectionType)}/${slugify(post.name)}`}>
-        View
+        {'Xem'}
       </Link>
     </Box>
   );
@@ -29,9 +29,9 @@ export const postUpdatedMessage = (sectionType, post) => {
         alignItems: 'center',
       }}
     >
-      <Typography>Post updated</Typography>
+      <Typography>{'Bài học được cập nhật thành công'}</Typography>
       <Link to={`/handbook/${slugify(sectionType)}/${slugify(post.name)}`}>
-        View
+        {'Xem'}
       </Link>
     </Box>
   );
@@ -46,8 +46,8 @@ export const sectionCreatedMessage = (section) => {
         alignItems: 'center',
       }}
     >
-      <Typography>New section created</Typography>
-      <Link to={`/handbook/${slugify(section.title)}`}>View</Link>
+      <Typography>{'Danh mục được tạo thành công'}</Typography>
+      <Link to={`/handbook/${slugify(section.title)}`}>{'Xem'}</Link>
     </Box>
   );
 };
@@ -61,8 +61,8 @@ export const sectionUpdatedMessage = (section) => {
         alignItems: 'center',
       }}
     >
-      <Typography>Section updated</Typography>
-      <Link to={`/handbook/${slugify(section.title)}`}>View</Link>
+      <Typography>{'Danh mục được cập nhật thành công'}</Typography>
+      <Link to={`/handbook/${slugify(section.title)}`}>{'Xem'}</Link>
     </Box>
   );
 };

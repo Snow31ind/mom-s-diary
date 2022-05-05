@@ -27,7 +27,7 @@ import GrowthBox from '../../GrowthBox/GrowthBox';
 import PostForm from '../../PostForm/PostForm';
 import CustomNoRowsOverlay from '../../Styled/CustomNoRowsOverlay';
 import SquareIconButton from '../../Styled/SquareIconButton';
-
+import CustomGridToolbar from '../../../components/CustomGridToolbar/CustomGridToolbar';
 const PostDataGrid = () => {
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading());
@@ -49,6 +49,7 @@ const PostDataGrid = () => {
     {
       field: 'id',
       flex: 1,
+      headerName: 'ID',
       renderHeader: () => <strong>ID</strong>,
       renderCell: (params) => (
         <Link
@@ -62,8 +63,9 @@ const PostDataGrid = () => {
     },
     {
       field: 'sectionId',
+      headerName: 'ID danh mục',
       flex: 1,
-      renderHeader: () => <strong>Danh mục</strong>,
+      renderHeader: () => <strong>ID danh mục</strong>,
     },
     {
       field: 'sectionTitle',
@@ -77,24 +79,28 @@ const PostDataGrid = () => {
     },
     {
       field: 'name',
+      headerName: 'Tên',
       flex: 1,
       description: 'Post name',
       renderHeader: () => <strong>Tên</strong>,
     },
     {
       field: 'desc',
+      headerName: 'Miêu tả',
       flex: 1,
       description: 'Post description',
       renderHeader: () => <strong>Miêu tả</strong>,
     },
     {
       field: 'content',
+      headerName: 'Nội dung',
       flex: 1,
       description: 'Post content',
       renderHeader: () => <strong>Nội dung</strong>,
     },
     {
       field: 'createdAt',
+      headerName: 'Ngày khởi tạo',
       type: 'date',
       flex: 1,
       description: 'Post publish day',
@@ -104,6 +110,7 @@ const PostDataGrid = () => {
     },
     {
       field: 'updatedAt',
+      headerName: 'Lần cập nhật gần nhất',
       type: 'date',
       flex: 1,
       description: 'Post last update day',
@@ -113,8 +120,10 @@ const PostDataGrid = () => {
     },
     {
       field: 'actions',
+      headerName: 'Thao tác',
       type: 'actions',
       flex: 1,
+      renderHeader: () => <strong>Thao tác</strong>,
       getActions: (params) => [
         <GridActionsCellItem
           label="Chỉnh sửa"
@@ -173,14 +182,14 @@ const PostDataGrid = () => {
         </Stack>
         <DataGrid
           autoHeight
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 25, 100]}
           loading={loading}
           columns={columns}
           rows={posts}
           components={{
-            Toolbar: GridToolbar,
             LoadingOverlay: LinearProgress,
             NoRowsOverlay: CustomNoRowsOverlay,
+            Toolbar: CustomGridToolbar,
           }}
           initialState={{
             columns: {
@@ -193,6 +202,74 @@ const PostDataGrid = () => {
             },
           }}
           sx={{ mt: 2 }}
+          localeText={{
+            noRowsLabel: 'Dữ liệu không tồn tại',
+            noResultsOverlayLabel: 'Không tồn tại dữ liệu cần tìm kiếm',
+            errorOverlayDefaultLabel: 'Lỗi',
+
+            toolbarColumns: 'Ẩn/hiện cột',
+            toolbarColumnsLabel: 'Ẩn/hiện cột',
+            columnsPanelTextFieldLabel: 'Tìm kiếm cột',
+            columnsPanelTextFieldPlaceholder: 'Tên cột',
+            columnsPanelDragIconLabel: 'Reorder column',
+            columnsPanelShowAllButton: 'Hiện tất cả',
+            columnsPanelHideAllButton: 'Che tất cả',
+
+            toolbarFilters: 'Lọc',
+            toolbarFiltersLabel: 'Lọc',
+            toolbarFiltersTooltipActive: (count) =>
+              count !== 1 ? `${count} bộ lọc` : `${count} bộ lọc`,
+
+            toolbarDensity: 'Kiêu hiện thị',
+            toolbarDensityLabel: 'Kiêu hiện thị',
+            toolbarDensityCompact: 'Hẹp',
+            toolbarDensityStandard: 'Tương đối',
+            toolbarDensityComfortable: 'Rộng',
+
+            toolbarExport: 'Xuất',
+            toolbarExportLabel: 'Xuất',
+            toolbarExportCSV: 'Format CSV',
+            toolbarExportPrint: 'In',
+
+            filterPanelAddFilter: 'Thêm bộ lọc',
+            filterPanelDeleteIconLabel: 'Xóa',
+            filterPanelLinkOperator: 'Quan hệ logic',
+            filterPanelOperators: 'Quan hệ', // TODO v6: rename to filterPanelOperator
+            filterPanelOperatorAnd: 'Và',
+            filterPanelOperatorOr: 'Hoặc',
+            filterPanelColumns: 'Cột',
+            filterPanelInputLabel: 'Giá trị',
+            filterPanelInputPlaceholder: 'Giá trị để lọc',
+
+            filterOperatorContains: 'Chứa',
+            filterOperatorEquals: 'Bằng',
+            filterOperatorStartsWith: 'Băt đầu với',
+            filterOperatorEndsWith: 'Kết thúc với',
+            filterOperatorIs: 'Là',
+            filterOperatorNot: 'Không phải là',
+            filterOperatorAfter: 'Sau khi',
+            filterOperatorOnOrAfter: 'Kể từ khi',
+            filterOperatorBefore: 'Trước khi',
+            filterOperatorOnOrBefore: 'Kể từ trước khi',
+            filterOperatorIsEmpty: 'Rỗng',
+            filterOperatorIsNotEmpty: 'Không rỗng',
+            filterOperatorIsAnyOf: 'Là bất kì',
+
+            columnMenuLabel: 'Menu',
+            columnMenuShowColumns: 'Bật ẩn/hiện cột',
+            columnMenuFilter: 'Bật bộ lọc',
+            columnMenuHideColumn: 'Ẩn',
+            columnMenuUnsort: 'Không sắp xếp',
+            columnMenuSortAsc: 'Sắp xếp tăng dần',
+            columnMenuSortDesc: 'Sắp xếp giảm dần',
+
+            columnHeaderSortIconLabel: 'Sắp xếp',
+
+            footerRowSelected: (count) =>
+              count !== 1
+                ? `${count.toLocaleString()} dòng được chọn`
+                : `${count.toLocaleString()} dòng được chọn`,
+          }}
         />
       </Box>
 

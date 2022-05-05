@@ -1,4 +1,4 @@
-import { serverTimestamp } from 'firebase/firestore';
+import { serverTimestamp, Timestamp } from 'firebase/firestore';
 
 class Section {
   constructor(title, name, photo, createdAt, updatedAt) {
@@ -16,7 +16,9 @@ export const sectionConverter = {
       title: section.title,
       name: section.name,
       photo: section.photo,
-      createdAt: serverTimestamp(),
+      createdAt: section.hasOwnProperty('createdAt')
+        ? Timestamp.fromDate(new Date(section.createdAt))
+        : serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
   },
