@@ -133,10 +133,10 @@ const SectionDataGrid = () => {
                   dispatch(
                     setDialog(
                       createDialogState(
-                        'Section removal',
-                        'Are you sure you want to remove this section?',
-                        'Cancel',
-                        'Remove',
+                        'Xóa danh mục',
+                        'Bạn có chắc chắn xóa danh mục này?',
+                        'Quay lại',
+                        'Tiếp tục',
                         () => dispatch(removeSection({ id }))
                       )
                     )

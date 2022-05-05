@@ -69,6 +69,7 @@ const PostDataGrid = () => {
     },
     {
       field: 'sectionTitle',
+      headerName: 'Loại danh mục',
       flex: 1,
       type: 'singleSelect',
       valueOptions: sections.map((section) => ({
@@ -141,10 +142,10 @@ const PostDataGrid = () => {
             dispatch(
               setDialog(
                 createDialogState(
-                  'Post removal',
-                  'Are you sure you want to remove this post?',
-                  'Cancel',
-                  'Process',
+                  'Xóa bài viết',
+                  'Bạn chắc chắn xóa bài viết này?',
+                  'Quay lại',
+                  'Tiếp tục',
                   () =>
                     dispatch(
                       removePost({

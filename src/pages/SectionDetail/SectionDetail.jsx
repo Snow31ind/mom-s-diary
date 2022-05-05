@@ -30,7 +30,7 @@ const SectionDetail = () => {
       <Outlet />
       {/* <Typography>{type}</Typography> */}
       <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
-        <Link to="/">Home</Link>
+        <Link to="/">{'Trang chủ'}</Link>
         <Typography color="black" fontWeight="bold">
           {section.title}
         </Typography>
