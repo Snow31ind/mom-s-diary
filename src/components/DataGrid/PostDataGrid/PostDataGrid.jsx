@@ -1,6 +1,12 @@
 import { Add, Delete, Edit } from '@mui/icons-material';
 import { Box, LinearProgress, Modal, Stack, Tooltip } from '@mui/material';
-import { DataGrid, GridActionsCellItem, GridToolbar } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridActionsCellItem,
+  GridToolbar,
+  GridToolbarColumnsButton,
+  GridToolbarContainer,
+} from '@mui/x-data-grid';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -43,7 +49,6 @@ const PostDataGrid = () => {
     {
       field: 'id',
       flex: 1,
-      description: 'Post ID',
       renderHeader: () => <strong>ID</strong>,
       renderCell: (params) => (
         <Link
@@ -58,44 +63,42 @@ const PostDataGrid = () => {
     {
       field: 'sectionId',
       flex: 1,
-      description: 'Section ID',
-      renderHeader: () => <strong>Section ID</strong>,
+      renderHeader: () => <strong>Danh mục</strong>,
     },
     {
       field: 'sectionTitle',
       flex: 1,
       type: 'singleSelect',
-      description: 'Post type',
       valueOptions: sections.map((section) => ({
         label: section.title,
         value: section.title,
       })),
-      renderHeader: () => <strong>Type</strong>,
+      renderHeader: () => <strong>Loại danh mục</strong>,
     },
     {
       field: 'name',
       flex: 1,
       description: 'Post name',
-      renderHeader: () => <strong>Name</strong>,
+      renderHeader: () => <strong>Tên</strong>,
     },
     {
       field: 'desc',
       flex: 1,
       description: 'Post description',
-      renderHeader: () => <strong>Description</strong>,
+      renderHeader: () => <strong>Miêu tả</strong>,
     },
     {
       field: 'content',
       flex: 1,
       description: 'Post content',
-      renderHeader: () => <strong>Content</strong>,
+      renderHeader: () => <strong>Nội dung</strong>,
     },
     {
       field: 'createdAt',
       type: 'date',
       flex: 1,
       description: 'Post publish day',
-      renderHeader: () => <strong>Published</strong>,
+      renderHeader: () => <strong>Ngày khởi tạo</strong>,
       valueFormatter: (params) =>
         `${new Date(params.value).toLocaleDateString()}`,
     },
@@ -104,7 +107,7 @@ const PostDataGrid = () => {
       type: 'date',
       flex: 1,
       description: 'Post last update day',
-      renderHeader: () => <strong>Last updated</strong>,
+      renderHeader: () => <strong>Lần cập nhật gần nhất</strong>,
       valueFormatter: (params) =>
         `${new Date(params.value).toLocaleDateString()}`,
     },
@@ -112,11 +115,9 @@ const PostDataGrid = () => {
       field: 'actions',
       type: 'actions',
       flex: 1,
-      description: 'Actions',
-      renderHeader: () => <strong>Actions</strong>,
       getActions: (params) => [
         <GridActionsCellItem
-          label="Update"
+          label="Chỉnh sửa"
           icon={<Edit />}
           onClick={() => {
             dispatch(setPost(params.row));
@@ -125,7 +126,7 @@ const PostDataGrid = () => {
         />,
         <GridActionsCellItem
           showInMenu
-          label="Remove"
+          label="Xóa"
           icon={<Delete />}
           onClick={() => {
             dispatch(
@@ -163,7 +164,7 @@ const PostDataGrid = () => {
         <Stack direction="row">
           <GrowthBox />
           <Box>
-            <Tooltip title="New post">
+            <Tooltip title="Tạo bài viết">
               <SquareIconButton size="small" onClick={createNewPostHandler}>
                 <Add />
               </SquareIconButton>

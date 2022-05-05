@@ -34,6 +34,11 @@ import {
 } from '../../../features/sections/sectionsSlice';
 import SectionForm from '../../SectionForm/SectionForm';
 import CustomSlider from '../../Slider/CustomSlider';
+import {
+  openDialog,
+  createDialogState,
+  setDialog,
+} from '../../../features/dialog/dialogSlice';
 
 const Section = ({ section, isLast }) => {
   const dispatch = useDispatch();
@@ -54,7 +59,19 @@ const Section = ({ section, isLast }) => {
   };
 
   const removeHandler = (id) => {
-    dispatch(removeSection({ id }));
+    dispatch(
+      setDialog(
+        createDialogState(
+          'Xóa danh mục',
+          'Bạn có chắc chắn xóa danh mục này?',
+          'Quay lại',
+          'Tiếp tục',
+          () => dispatch(removeSection({ id }))
+        )
+      )
+    );
+
+    dispatch(openDialog());
   };
 
   const openCreatePostFormModalHandler = () => {
@@ -108,7 +125,7 @@ const Section = ({ section, isLast }) => {
             <>
               <GrowthBox />
               <Stack direction="row" alignItems="center" spacing={1}>
-                <Tooltip title="Edit section">
+                <Tooltip title="Cập nhật danh mục">
                   <SquareIconButton
                     size="small"
                     color="primary"
@@ -118,7 +135,7 @@ const Section = ({ section, isLast }) => {
                   </SquareIconButton>
                 </Tooltip>
 
-                <Tooltip title="New post">
+                <Tooltip title="Tạo bài viết">
                   <SquareIconButton
                     size="small"
                     color="success"
@@ -129,7 +146,7 @@ const Section = ({ section, isLast }) => {
                 </Tooltip>
 
                 {!posts.length && (
-                  <Tooltip title="Remove section">
+                  <Tooltip title="Xóa danh mục">
                     <SquareIconButton
                       size="small"
                       color="error"
@@ -167,7 +184,7 @@ const Section = ({ section, isLast }) => {
               display: 'flex',
             }}
           >
-            <Typography>No post is available</Typography>
+            <Typography>Trống</Typography>
           </Box>
         )}
 

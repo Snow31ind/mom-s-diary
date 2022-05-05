@@ -1,13 +1,15 @@
-import { LockRounded, SettingsCellSharp } from '@mui/icons-material';
+import { Close, LockRounded, SettingsCellSharp } from '@mui/icons-material';
 import {
   Avatar,
   Box,
   Button,
   CircularProgress,
+  IconButton,
   Link,
   List,
   ListItem,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -26,6 +28,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
   } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const [isSignIn, setIsSignIn] = useState(true);
 
   const loading = useSelector(selectLoading());
@@ -68,7 +71,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
           <LockRounded />
         </Avatar>
         <Typography variant="h5" sx={{ mt: 1 }}>
-          {isSignIn ? 'Admin' : 'Sign up'}
+          {isSignIn ? 'Quản trị viên' : 'Sign up'}
         </Typography>
       </Box>
 
@@ -89,7 +92,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
                 <TextField
                   autoFocus
                   fullWidth
-                  label="Email"
+                  label="Tài khoản email"
                   error={Boolean(errors.email)}
                   inputProps={{ type: 'email' }}
                   helperText={
@@ -118,7 +121,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
                 <TextField
                   autoFocus
                   fullWidth
-                  label="Password"
+                  label="Mật khẩu"
                   error={Boolean(errors.password)}
                   inputProps={{ type: 'password' }}
                   helperText={
@@ -169,7 +172,7 @@ const LoginForm = ({ closeLoginModalHandler }) => {
           <ListItem>
             {!loading ? (
               <Button fullWidth type="submit" variant="contained">
-                {isSignIn ? 'SIGN IN' : 'SIGN UP'}
+                {isSignIn ? 'Đăng nhập' : 'SIGN UP'}
               </Button>
             ) : (
               <Button fullWidth variant="contained">
@@ -192,6 +195,15 @@ const LoginForm = ({ closeLoginModalHandler }) => {
           </ListItem> */}
         </List>
       </form>
+
+      <Tooltip title="Thoát">
+        <IconButton
+          onClick={closeLoginModalHandler}
+          sx={{ position: 'absolute' }}
+        >
+          <Close color="action" fontSize="small" />
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };

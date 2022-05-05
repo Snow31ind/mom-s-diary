@@ -38,10 +38,10 @@ const Sections = (props) => {
   return (
     <React.Fragment>
       <Box>
-        {isAdmin && (
+        {isAdmin && !loading && (
           <Stack direction="row">
             <GrowthBox />
-            <Tooltip title="New section">
+            <Tooltip title="Tạo danh mục">
               <SquareIconButton
                 variant="contained"
                 size="small"

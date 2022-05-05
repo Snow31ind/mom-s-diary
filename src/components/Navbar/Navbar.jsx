@@ -102,7 +102,7 @@ const Navbar = () => {
                   <ListItemIcon>
                     <Logout />
                   </ListItemIcon>
-                  <Typography>Logout</Typography>
+                  <Typography>Đăng xuất</Typography>
                 </MenuItem>
               </Menu>
             </>

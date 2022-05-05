@@ -1,8 +1,10 @@
+import { Close } from '@mui/icons-material';
 import {
   Box,
   Button,
   CircularProgress,
   FormControl,
+  IconButton,
   InputLabel,
   List,
   ListItem,
@@ -115,9 +117,9 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <Typography textAlign="center" variant="h6" fontWeight="bold">
-        {isEditingPost && 'Update post'}
-        {isCreatingPostWithinSection && 'New post'}
-        {isCreatingPost && 'New post'}
+        {isEditingPost && 'Cập nhật bài viết'}
+        {isCreatingPostWithinSection && 'Bài viết mới'}
+        {isCreatingPost && 'Bài viết mới'}
       </Typography>
 
       <form onSubmit={handleSubmit(submitHandler)}>
@@ -130,7 +132,7 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
               defaultValue={section ? section.id : post ? post.sectionId : ''}
               render={({ field }) => (
                 <FormControl fullWidth variant="filled">
-                  <InputLabel id="select-type">Section title</InputLabel>
+                  <InputLabel id="select-type">Tiêu đề danh mục</InputLabel>
                   <Select
                     disabled={
                       isCreatingPostWithinSection || isEditingPost
@@ -168,7 +170,7 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
                   fullWidth
                   multiline
                   variant="outlined"
-                  label="Name *"
+                  label="Tên bài viết (bắt buộc)"
                   inputProps={{ type: 'text' }}
                   error={Boolean(errors.name)}
                   helperText={
@@ -202,7 +204,7 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
                   minRows={2}
                   maxRows={2}
                   variant="outlined"
-                  label="Description *"
+                  label="Miêu tả bài viết (bắt buộc)"
                   inputProps={{ type: 'text' }}
                   error={Boolean(errors.desc)}
                   helperText={
@@ -236,7 +238,7 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
                   minRows={12}
                   maxRows={12}
                   variant="outlined"
-                  label="Content *"
+                  label="Nội dung bài viết (bắt buộc)"
                   inputProps={{ type: 'text' }}
                   error={Boolean(errors.desc)}
                   helperText={
@@ -268,12 +270,12 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
               color="warning"
               onClick={post ? resetHandler : clearHandler}
             >
-              {isEditingPost ? 'RESET' : 'CLEAR'}
+              {isEditingPost ? 'Đặt lại' : 'Xóa'}
             </Button>
             <GrowthBox />
             {!loading ? (
               <Button type="submit" color="success" variant="contained">
-                {isEditingPost ? 'UPDATE' : 'CREATE'}
+                {isEditingPost ? 'Cập nhật' : 'Tạo'}
               </Button>
             ) : (
               <Button variant="contained" disabled>
@@ -283,6 +285,13 @@ const PostForm = ({ closePostFormModalHandler, action }) => {
           </ListItem>
         </List>
       </form>
+
+      <IconButton
+        onClick={closePostFormModalHandler}
+        sx={{ position: 'absolute' }}
+      >
+        <Close color="action" fontSize="small" />
+      </IconButton>
     </Box>
   );
 };

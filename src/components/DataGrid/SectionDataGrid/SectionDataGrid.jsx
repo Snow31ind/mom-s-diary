@@ -31,6 +31,7 @@ import {
   openDialog,
   setDialog,
 } from '../../../features/dialog/dialogSlice';
+import CustomGridToolbar from '../../CustomGridToolbar/CustomGridToolbar';
 
 const SectionDataGrid = () => {
   const dispatch = useDispatch();
@@ -50,7 +51,7 @@ const SectionDataGrid = () => {
       field: 'id',
       // headerName: 'Section ID',
       flex: 1,
-      description: "Section's id",
+      description: 'ID của danh mục',
       // valueFormatter: (params) => `${params.value}`,
       renderHeader: (params) => <strong>{'ID'}</strong>,
       renderCell: (params) => (
@@ -63,41 +64,43 @@ const SectionDataGrid = () => {
       field: 'title',
       // headerName: 'Section title',
       flex: 1,
-      description: "Section's title",
+      description: 'Tiêu đề danh mục',
       // editable: true,
       valueFormatter: (params) => `${params.value}`,
-      renderHeader: (params) => <strong>{'Title'}</strong>,
+      renderHeader: (params) => <strong>{'Tiêu đề'}</strong>,
     },
     {
       field: 'count',
       // headerName: 'Number of posts',
       flex: 1,
       type: 'number',
+      description: 'Số lượng bài viết',
       valueGetter: (params) => `${params.row.posts.length}`,
-      renderHeader: (params) => <strong>{'Posts'}</strong>,
+      renderHeader: (params) => <strong>{'Bài viết'}</strong>,
     },
     {
       field: 'createdAt',
       // headerName: 'Published',
       flex: 1,
       type: 'date',
+      description: 'Ngày danh mục được khởi tạo',
       valueFormatter: (params) =>
         `${new Date(params.value).toLocaleDateString()}`,
-      renderHeader: (params) => <strong>{'Created on'}</strong>,
+      renderHeader: (params) => <strong>{'Ngày khởi tạo'}</strong>,
     },
     {
       field: 'updatedAt',
       // headerName: 'Last updated',
       flex: 1,
       type: 'date',
+      description: 'Ngày danh mục được cập nhật',
       valueFormatter: (params) => `${new Date(params.value).toLocaleString()}`,
-      renderHeader: (params) => <strong>{'Updated on'}</strong>,
+      renderHeader: (params) => <strong>{'Lần cập nhật gần nhất'}</strong>,
     },
     {
       field: 'actions',
       flex: 1,
       type: 'actions',
-      renderHeader: (params) => <strong>{'Actions'}</strong>,
       getActions: (params) => {
         return [
           {
@@ -142,7 +145,7 @@ const SectionDataGrid = () => {
 
                   dispatch(openDialog());
                 }}
-                label="Delete"
+                label="Xóa"
               />
             ),
           },
@@ -164,7 +167,7 @@ const SectionDataGrid = () => {
         <Stack direction="row">
           <GrowthBox />
 
-          <Tooltip title="New section">
+          <Tooltip title="Tạo danh mục">
             <SquareIconButton size="small" onClick={createSectionHandler}>
               <Add />
             </SquareIconButton>
@@ -180,7 +183,7 @@ const SectionDataGrid = () => {
           columns={columns}
           rows={sections}
           components={{
-            Toolbar: GridToolbar,
+            Toolbar: CustomGridToolbar,
             LoadingOverlay: CustomLinearProgress,
             NoRowsOverlay: CustomNoRowsOverlay,
           }}

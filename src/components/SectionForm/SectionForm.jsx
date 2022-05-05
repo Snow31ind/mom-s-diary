@@ -1,7 +1,9 @@
+import { Close } from '@mui/icons-material';
 import {
   Box,
   Button,
   CircularProgress,
+  IconButton,
   List,
   ListItem,
   TextField,
@@ -77,8 +79,8 @@ const SectionForm = ({ action, closeHandler }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <Typography textAlign="center" variant="h6" fontWeight="bold">
-        {isCreatingSection && 'New section'}
-        {isUpdatingSection && 'Update section'}
+        {isCreatingSection && 'Danh mục mới'}
+        {isUpdatingSection && 'Cập nhật danh mục'}
       </Typography>
 
       <form onSubmit={handleSubmit(submitHandler)}>
@@ -95,7 +97,7 @@ const SectionForm = ({ action, closeHandler }) => {
                     disabled
                     fullWidth
                     variant="outlined"
-                    label="Section id"
+                    label="ID cho danh mục"
                     inputProps={{ type: 'text' }}
                     {...field}
                   />
@@ -119,7 +121,7 @@ const SectionForm = ({ action, closeHandler }) => {
                   autoFocus
                   fullWidth
                   variant="outlined"
-                  label="Title"
+                  label="Tiêu đề danh mục"
                   inputProps={{ type: 'text' }}
                   error={Boolean(errors.title)}
                   helperText={
@@ -153,7 +155,7 @@ const SectionForm = ({ action, closeHandler }) => {
                       fullWidth
                       multiline
                       variant="outlined"
-                      label="Unique ID"
+                      label="ID cho danh mục"
                       inputProps={{ type: 'text' }}
                       minRows={2}
                       maxRows={2}
@@ -186,7 +188,7 @@ const SectionForm = ({ action, closeHandler }) => {
                       fullWidth
                       multiline
                       variant="outlined"
-                      label="Name"
+                      label="Tên danh mục"
                       inputProps={{ type: 'text' }}
                       minRows={2}
                       maxRows={2}
@@ -219,15 +221,15 @@ const SectionForm = ({ action, closeHandler }) => {
             }}
           >
             <Button variant="contained" color="warning" onClick={clearForm}>
-              RESET
+              Đặt lại
             </Button>
             <GrowthBox />
             {!loading ? (
               <Button type="submit" color="success" variant="contained">
                 {action === 'create'
-                  ? 'CREATE'
+                  ? 'Tạo'
                   : action === 'update'
-                  ? 'SAVE'
+                  ? 'Cập nhật'
                   : ''}
               </Button>
             ) : (
@@ -238,6 +240,10 @@ const SectionForm = ({ action, closeHandler }) => {
           </ListItem>
         </List>
       </form>
+
+      <IconButton onClick={closeHandler} sx={{ position: 'absolute' }}>
+        <Close color="action" fontSize="small" />
+      </IconButton>
     </Box>
   );
 };

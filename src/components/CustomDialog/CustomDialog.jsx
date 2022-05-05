@@ -42,7 +42,7 @@ const CustomDialog = () => {
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
-      <DialogActions>
+      <DialogActions disableSpacing sx={{ justifyContent: 'space-between' }}>
         <Button color="warning" variant="text" onClick={closeHandler}>
           {onCancelText}
         </Button>
