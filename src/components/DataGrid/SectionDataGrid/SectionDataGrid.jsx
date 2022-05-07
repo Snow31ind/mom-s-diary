@@ -32,7 +32,7 @@ import {
   openDialog,
   setDialog,
 } from '../../../features/dialog/dialogSlice';
-import CustomGridToolbar from '../../CustomGridToolbar/CustomGridToolbar';
+import CustomSectionGridToolbar from '../../CustomSectionGridToolbar/CustomSectionGridToolbar';
 
 const SectionDataGrid = () => {
   const dispatch = useDispatch();
@@ -50,10 +50,10 @@ const SectionDataGrid = () => {
   const columns = [
     {
       field: 'id',
-      headerName: 'ID',
+      headerName: 'Mã danh mục',
       flex: 1,
       // valueFormatter: (params) => `${params.value}`,
-      renderHeader: (params) => <strong>{'ID'}</strong>,
+      renderHeader: (params) => <strong>{'Mã danh mục'}</strong>,
       renderCell: (params) => (
         <Link to={`/handbook/${slugify(params.row.title)}`}>
           {params.value}
@@ -109,7 +109,11 @@ const SectionDataGrid = () => {
                 label="Edit"
                 icon={<Edit />}
                 onClick={() => {
-                  const section = { id: params.id, title: params.row.title };
+                  const section = {
+                    id: params.id,
+                    title: params.row.title,
+                    name: params.row.name,
+                  };
                   // console.log(section);
                   dispatch(setSection(section));
                   setOpenSectionForm({
@@ -162,17 +166,6 @@ const SectionDataGrid = () => {
   return (
     <React.Fragment>
       <Box>
-        {/* Admin tools */}
-        <Stack direction="row">
-          <GrowthBox />
-
-          <Tooltip title="Tạo danh mục">
-            <SquareIconButton size="small" onClick={createSectionHandler}>
-              <Add />
-            </SquareIconButton>
-          </Tooltip>
-        </Stack>
-
         <DataGrid
           autoHeight
           pagination
@@ -249,7 +242,7 @@ const SectionDataGrid = () => {
           columns={columns}
           rows={sections}
           components={{
-            Toolbar: CustomGridToolbar,
+            Toolbar: CustomSectionGridToolbar(createSectionHandler),
             LoadingOverlay: CustomLinearProgress,
             NoRowsOverlay: CustomNoRowsOverlay,
           }}
@@ -263,7 +256,7 @@ const SectionDataGrid = () => {
               },
             },
           }}
-          sx={{ mt: 2 }}
+          sx={{ mt: 1 }}
         />
       </Box>
 

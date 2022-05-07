@@ -23,11 +23,11 @@ import {
 } from '../../../features/sections/selector';
 import { removePost } from '../../../thunks/sections';
 import { slugify } from '../../../utils/helpers';
+import CustomPostGridToolbar from '../../CustomPostGridToolbar/CustomPostGridToolbar';
 import GrowthBox from '../../GrowthBox/GrowthBox';
 import PostForm from '../../PostForm/PostForm';
 import CustomNoRowsOverlay from '../../Styled/CustomNoRowsOverlay';
 import SquareIconButton from '../../Styled/SquareIconButton';
-import CustomGridToolbar from '../../../components/CustomGridToolbar/CustomGridToolbar';
 const PostDataGrid = () => {
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading());
@@ -49,8 +49,8 @@ const PostDataGrid = () => {
     {
       field: 'id',
       flex: 1,
-      headerName: 'ID',
-      renderHeader: () => <strong>ID</strong>,
+      headerName: 'Mã bài học',
+      renderHeader: () => <strong>Mã bài học</strong>,
       renderCell: (params) => (
         <Link
           to={`/handbook/${slugify(params.row.sectionTitle)}/${slugify(
@@ -171,16 +171,6 @@ const PostDataGrid = () => {
   return (
     <React.Fragment>
       <Box sx={{ flex: 1 }}>
-        <Stack direction="row">
-          <GrowthBox />
-          <Box>
-            <Tooltip title="Tạo bài viết">
-              <SquareIconButton size="small" onClick={createNewPostHandler}>
-                <Add />
-              </SquareIconButton>
-            </Tooltip>
-          </Box>
-        </Stack>
         <DataGrid
           autoHeight
           rowsPerPageOptions={[10, 25, 100]}
@@ -190,7 +180,7 @@ const PostDataGrid = () => {
           components={{
             LoadingOverlay: LinearProgress,
             NoRowsOverlay: CustomNoRowsOverlay,
-            Toolbar: CustomGridToolbar,
+            Toolbar: CustomPostGridToolbar(createNewPostHandler),
           }}
           initialState={{
             columns: {
@@ -202,7 +192,6 @@ const PostDataGrid = () => {
               },
             },
           }}
-          sx={{ mt: 2 }}
           localeText={{
             noRowsLabel: 'Dữ liệu không tồn tại',
             noResultsOverlayLabel: 'Không tồn tại dữ liệu cần tìm kiếm',
@@ -271,6 +260,7 @@ const PostDataGrid = () => {
                 ? `${count.toLocaleString()} dòng được chọn`
                 : `${count.toLocaleString()} dòng được chọn`,
           }}
+          sx={{ mt: 1 }}
         />
       </Box>
 

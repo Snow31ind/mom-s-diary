@@ -133,7 +133,7 @@ const Section = ({ section, isLast }) => {
                   </SquareIconButton>
                 </Tooltip>
 
-                <Tooltip title="Tạo bài viết">
+                <Tooltip title="Tạo bài học">
                   <SquareIconButton
                     size="small"
                     color="success"

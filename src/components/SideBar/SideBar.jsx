@@ -1,10 +1,12 @@
-import { DynamicFeed, Person } from '@mui/icons-material';
+import { Book, DynamicFeed, Person } from '@mui/icons-material';
 import {
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
+  Typography,
 } from '@mui/material';
 import React from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -14,15 +16,15 @@ const SideBar = ({ selectedSection }) => {
 
   const sections = [
     {
-      name: 'Sections',
+      name: 'Danh mục',
       label: 'sections',
       icon: <DynamicFeed />,
       onClick: () => navigate('/admin/sections'),
     },
     {
-      name: 'Posts',
+      name: 'Bài học',
       label: 'posts',
-      icon: <DynamicFeed />,
+      icon: <Book />,
       onClick: () => navigate('/admin/posts'),
     },
   ];

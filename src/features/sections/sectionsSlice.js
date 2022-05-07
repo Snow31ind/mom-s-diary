@@ -8,6 +8,7 @@ import {
   fetchSectionBySlug,
   updatePostById,
   updateSection,
+  updateSectionById,
 } from '../../thunks/sections';
 import { toast } from 'react-toastify';
 import { TOAST_LOADING } from '../../constants/toast';
@@ -230,6 +231,26 @@ const sectionsSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
+    [updateSectionById.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateSectionById.fulfilled]: (state, action) => {
+      const updatedSection = action.payload;
+
+      state.sections = state.sections.map((section) =>
+        section.id !== updatedSection.id ? section : updatedSection
+      );
+
+      state.loading = false;
+
+      toast.success(sectionUpdatedMessage(updatedSection), {
+        onOpen: (props) => toast.dismiss(TOAST_LOADING),
+      });
+    },
+  },
+  [updateSectionById.rejected]: (state, action) => {
+    state.loading = false;
+    state.error = action.payload;
   },
 });
 

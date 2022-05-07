@@ -41,17 +41,17 @@ const PostDetail = () => {
           </Typography>
         </Breadcrumbs>
 
-        <Card elevation={0} sx={{ bgcolor: 'grey.100' }}>
+        <Card elevation={0} sx={{ bgcolor: 'grey.100', mt: 2 }}>
           <CardMedia component="img" src={post.image} height={500} />
           {/* <CardHeader title={<Typography>{publishedAt}</Typography>} /> */}
-          <CardContent>
-            <Typography variant="h5" fontWeight="bold">
+          <CardContent sx={{ pl: 0 }}>
+            <Typography variant="h3" fontWeight="bold">
               {post.name}
             </Typography>
             <Typography variant="body1" sx={{ mt: 1 }}>
               {post.desc}
             </Typography>
-            <Typography variant="body2" sx={{ mt: 2 }}>
+            <Typography variant="h6" sx={{ mt: 2 }}>
               {post.content}
             </Typography>
           </CardContent>

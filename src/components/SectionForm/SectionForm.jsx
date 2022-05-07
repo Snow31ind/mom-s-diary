@@ -10,13 +10,24 @@ import {
   Typography,
 } from '@mui/material';
 import React from 'react';
+import { useState } from 'react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { clearSection } from '../../features/sections/sectionsSlice';
-import { selectLoading, selectSection } from '../../features/sections/selector';
-import { createSection, updateSection } from '../../thunks/sections';
+import sectionsSlice, {
+  clearSection,
+} from '../../features/sections/sectionsSlice';
+import {
+  selectLoading,
+  selectSection,
+  selectSections,
+} from '../../features/sections/selector';
+import {
+  createSection,
+  updateSection,
+  updateSectionById,
+} from '../../thunks/sections';
 import { slugify } from '../../utils/helpers';
 import GrowthBox from '../GrowthBox/GrowthBox';
 import defaultImage from '/images/memories.png';
@@ -28,11 +39,16 @@ const SectionForm = ({ action, closeHandler }) => {
     formState: { errors },
     setValue,
     register,
+    setError,
     getValues,
   } = useForm();
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading());
   const section = useSelector(selectSection());
+  const sections = useSelector(selectSections());
+
+  // const [photoName, setPhotoName] = useState(section.photo);
+  // const [file, setFile] = useState(null);
 
   const isCreatingSection = action === 'create';
   const isUpdatingSection = action === 'update';
@@ -40,35 +56,52 @@ const SectionForm = ({ action, closeHandler }) => {
   useEffect(() => {
     if (isUpdatingSection) {
       setValue('title', section.title);
+      setValue('name', section.name);
     }
   }, [action]);
 
   const submitHandler = ({ title, id, name, photo }) => {
+    // Duplicating titles are handled by the rules
+
     if (isCreatingSection) {
-      const file = photo[0];
+      if (sections.find((section) => section.id === slugify(title))) {
+        return toast.error(
+          'Danh mục với tiêu đề này đã tồn tại, hãy tạo danh mục với tiêu đè khác.'
+        );
+      } else {
+        const file = photo[0];
 
-      const section = {
-        title,
-        name,
-        photo: file.name,
-      };
+        const section = {
+          title,
+          name,
+          photo: file.name,
+        };
 
-      dispatch(createSection({ section, id: slugify(title), file }));
-      clearForm();
-      closeHandler();
+        dispatch(createSection({ section, id: slugify(title), file }));
+        clearForm();
+        closeHandler();
+      }
     } else if (isUpdatingSection) {
-      if (title !== section.title) {
+      if (section.title === title) {
+        if (section.name === name) {
+          return toast.error('Thay đổi để cập nhật danh mục.');
+        } else {
+          const newSection = {
+            name,
+          };
+
+          dispatch(updateSectionById({ section: newSection, id }));
+        }
+      } else {
         const newSection = {
           title,
+          name,
         };
 
         dispatch(updateSection({ section: newSection, id }));
-      } else {
-        toast.warning('Thay đổi nội dung khi cập nhật danh mục');
+        clearForm();
+        closeHandler();
       }
-
-      clearForm();
-      closeHandler();
     }
   };
 
@@ -81,6 +114,7 @@ const SectionForm = ({ action, closeHandler }) => {
       setValue('image', '');
     } else if (isUpdatingSection) {
       setValue('title', section.title);
+      setValue('name', section.name);
     }
   };
 
@@ -135,8 +169,8 @@ const SectionForm = ({ action, closeHandler }) => {
                   helperText={
                     errors.title
                       ? errors.title.type === 'minLength'
-                        ? 'Title is invalid'
-                        : 'Title is required'
+                        ? 'Tiêu đề không hợp lệ'
+                        : 'Tiêu đề là bắt buộc'
                       : ''
                   }
                   {...field}
@@ -146,47 +180,52 @@ const SectionForm = ({ action, closeHandler }) => {
           </ListItem>
 
           {/* Name */}
-          {isCreatingSection && (
-            <React.Fragment>
-              <ListItem>
-                <Controller
-                  name="name"
-                  control={control}
-                  defaultValue={''}
-                  rules={{
-                    required: true,
-                    minLength: 1,
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      autoFocus
-                      fullWidth
-                      multiline
-                      variant="outlined"
-                      label="Tên danh mục"
-                      inputProps={{ type: 'text' }}
-                      minRows={2}
-                      maxRows={2}
-                      error={Boolean(errors.name)}
-                      helperText={
-                        errors.name
-                          ? errors.name.type === 'minLength'
-                            ? 'Name is invalid'
-                            : 'Name is required'
-                          : ''
-                      }
-                      {...field}
-                    />
-                  )}
+          <ListItem>
+            <Controller
+              name="name"
+              control={control}
+              defaultValue={''}
+              rules={{
+                required: true,
+                minLength: 1,
+              }}
+              render={({ field }) => (
+                <TextField
+                  autoFocus
+                  fullWidth
+                  multiline
+                  variant="outlined"
+                  label="Tên danh mục"
+                  inputProps={{ type: 'text' }}
+                  minRows={2}
+                  maxRows={2}
+                  error={Boolean(errors.name)}
+                  helperText={
+                    errors.name
+                      ? errors.name.type === 'minLength'
+                        ? 'Name is invalid'
+                        : 'Name is required'
+                      : ''
+                  }
+                  {...field}
                 />
-              </ListItem>
+              )}
+            />
+          </ListItem>
 
-              {/* Image */}
-              <ListItem>
-                <input {...register('photo')} type="file" />
-              </ListItem>
-            </React.Fragment>
-          )}
+          {/* Image */}
+          {/* <ListItem>
+            <input
+              {...register('photo')}
+              type="file"
+              style={{ color: 'rgba(0,0,0,0)' }}
+              onChange={(e) => {
+                console.log(e.target.files[0].name);
+                setPhotoName(e.target.files[0].name);
+              }}
+            />
+            <Typography>{photoName}</Typography>
+          </ListItem> */}
 
           {/* Submit button */}
           <ListItem

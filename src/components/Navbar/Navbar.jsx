@@ -57,7 +57,7 @@ const Navbar = () => {
 
   return (
     <React.Fragment>
-      <AppBar>
+      <AppBar sx={{}}>
         <Toolbar>
           <Link href="/">
             <Typography color="white" fontSize={20} fontFamily="Helvetica">

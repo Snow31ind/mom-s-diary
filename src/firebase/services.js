@@ -214,6 +214,31 @@ export const updateSection = async (id, section) => {
   return updatedSection;
 };
 
+export const updateSectionById = async (section, id) => {
+  await updateDoc(
+    doc(db, 'handbook', id).withConverter(sectionConverter),
+    section
+  );
+
+  const updatedSectionSnapshot = await getDoc(
+    doc(db, 'handbook', id).withConverter(sectionConverter)
+  );
+
+  const postsSnapshot = await getDocs(
+    collection(db, id).withConverter(postConverter)
+  );
+
+  const posts = await fetchPostsByType(id);
+
+  const updatedSection = {
+    ...updatedSectionSnapshot.data(),
+    id,
+    posts,
+  };
+
+  return updatedSection;
+};
+
 export const fetchSectionById = async (id) => {
   const sectionSnapshot = await getDoc(
     doc(db, 'handbook', id).withConverter(sectionConverter)

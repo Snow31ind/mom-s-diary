@@ -59,8 +59,8 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
     dispatch(
       setDialog(
         createDialogState(
-          'Xóa bài viết',
-          'Bạn chắc chắn xóa bài viết này?',
+          'Xóa bài học',
+          'Bạn chắc chắn xóa bài học này?',
           'Quay lại',
           'Tiếp tục',
           () => removeHandler(sectionId, id)
@@ -136,7 +136,7 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
           }}
         >
           <GrowthBox />
-          <Tooltip title="Xóa bài viết">
+          <Tooltip title="Xóa bài học">
             <SquareIconButton
               size="small"
               color="error"
@@ -146,7 +146,7 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
             </SquareIconButton>
           </Tooltip>
 
-          <Tooltip title="Cập nhật bài viết">
+          <Tooltip title="Cập nhật bài học">
             <SquareIconButton
               size="small"
               color="primary"

@@ -82,3 +82,14 @@ export const updateSection = createAsyncThunk(
     return { updatedSection, oldSectionId: id };
   }
 );
+
+export const updateSectionById = createAsyncThunk(
+  '/sections/updateById',
+  async (params) => {
+    const { section, id } = params;
+
+    const updatedSection = await api.updateSectionById(section, id);
+
+    return updatedSection;
+  }
+);
