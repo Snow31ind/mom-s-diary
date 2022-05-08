@@ -47,6 +47,8 @@ const SectionForm = ({ action, closeHandler }) => {
   const section = useSelector(selectSection());
   const sections = useSelector(selectSections());
 
+  const [image, setImage] = useState('');
+
   // const [photoName, setPhotoName] = useState(section.photo);
   // const [file, setFile] = useState(null);
 
@@ -57,18 +59,20 @@ const SectionForm = ({ action, closeHandler }) => {
     if (isUpdatingSection) {
       setValue('title', section.title);
       setValue('name', section.name);
+      setImage(section.photo);
     }
   }, [action]);
 
   const submitHandler = ({ title, id, name, photo }) => {
-    // Duplicating titles are handled by the rules
-
+    // Creating a new section
     if (isCreatingSection) {
+      // The title already exists
       if (sections.find((section) => section.id === slugify(title))) {
         return toast.error(
           'Danh mục với tiêu đề này đã tồn tại, hãy tạo danh mục với tiêu đè khác.'
         );
       } else {
+        // The title does not exist -> add new section
         const file = photo[0];
 
         const section = {
@@ -82,25 +86,40 @@ const SectionForm = ({ action, closeHandler }) => {
         closeHandler();
       }
     } else if (isUpdatingSection) {
+      // Updating section
+
+      // The title is not changed
       if (section.id === slugify(title)) {
-        if (section.name === name) {
-          return toast.error('Thay đổi nội dung để cập nhật danh mục.');
-        } else {
+        // At least one field is changed -> update section
+        if (section.name !== name || section.photo !== image) {
+          const file = photo ? photo[0] : null;
+
           const newSection = {
             name,
+            photo: photo[0] ? photo[0].name : image,
           };
 
-          dispatch(updateSectionById({ section: newSection, id }));
+          dispatch(updateSectionById({ section: newSection, id, file }));
+          clearForm();
+          closeHandler();
+        } else {
+          // None field is changed -> toast
+          return toast.error('Thay đổi nội dung để cập nhật danh mục.');
         }
       } else if (sections.find((section) => section.id === slugify(title))) {
+        // The title is changed but it has already existed -> toast
         return toast.error('Danh mục này đã tồn tại.');
       } else {
+        // Everything is changed -> update section
+        const file = photo[0] || null;
+
         const newSection = {
           title,
           name,
+          photo: photo[0] ? photo[0].name : image,
         };
 
-        dispatch(updateSection({ section: newSection, id }));
+        dispatch(updateSection({ section: newSection, id, file }));
         clearForm();
         closeHandler();
       }
@@ -216,12 +235,39 @@ const SectionForm = ({ action, closeHandler }) => {
           </ListItem>
 
           {/* Image */}
-          <ListItem>
+          <ListItem
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+            }}
+          >
             <input
-              {...register('photo')}
+              {...register('photo', {
+                ...(isCreatingSection && {
+                  minLength: 1,
+                  required: true,
+                }),
+              })}
               type="file"
-              // style={{ color: 'rgba(0,0,0,0)' }}
+              // value={image}
+              onChange={(e) => {
+                // console.log(e.currentTarget.files[0]);
+                setImage(e.currentTarget.files[0].name);
+              }}
+              style={{ color: 'rgba(0,0,0,0)' }}
             />
+            {errors.photo && (
+              <Typography
+                color="error.main"
+                variant="caption"
+                sx={{ ml: 1.5, mt: 1 }}
+              >
+                Chọn file hình ảnh cho danh mục
+              </Typography>
+            )}
+            {image && <Typography>{image}</Typography>}
           </ListItem>
 
           {/* Submit button */}

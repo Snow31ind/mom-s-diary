@@ -46,7 +46,6 @@ export const updatePostById = createAsyncThunk(
   async (params, thunkAPI) => {
     const { file, data, id } = params;
     const updatedPost = await api.updatePostById(file, id, data);
-
     return updatedPost;
   }
 );
@@ -75,9 +74,9 @@ export const removeSection = createAsyncThunk(
 export const updateSection = createAsyncThunk(
   '/section/update',
   async (params, thunkAPI) => {
-    const { section, id } = params;
+    const { section, id, file } = params;
 
-    const updatedSection = await api.updateSection(id, section);
+    const updatedSection = await api.updateSection(id, section, file);
 
     return { updatedSection, oldSectionId: id };
   }
@@ -86,9 +85,9 @@ export const updateSection = createAsyncThunk(
 export const updateSectionById = createAsyncThunk(
   '/sections/updateById',
   async (params) => {
-    const { section, id } = params;
+    const { section, id, file } = params;
 
-    const updatedSection = await api.updateSectionById(section, id);
+    const updatedSection = await api.updateSectionById(section, id, file);
 
     return updatedSection;
   }

@@ -30,6 +30,7 @@ import PostForm from '../../PostForm/PostForm';
 import {
   clearPost,
   clearSection,
+  setPost,
   setSection,
 } from '../../../features/sections/sectionsSlice';
 import SectionForm from '../../SectionForm/SectionForm';
@@ -75,7 +76,7 @@ const Section = ({ section, isLast }) => {
   };
 
   const openCreatePostFormModalHandler = () => {
-    dispatch(setSection(section));
+    dispatch(setPost({ sectionId: section.id }));
     setPostFormAction('createWithinSection');
     setOpenPostForm(true);
   };

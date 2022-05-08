@@ -52,7 +52,6 @@ const SectionDataGrid = () => {
       field: 'id',
       headerName: 'Mã danh mục',
       flex: 1,
-      // valueFormatter: (params) => `${params.value}`,
       renderHeader: (params) => <strong>{'Mã danh mục'}</strong>,
       renderCell: (params) => (
         <Link to={`/handbook/${slugify(params.row.title)}`}>
@@ -67,6 +66,15 @@ const SectionDataGrid = () => {
       description: 'Tiêu đề danh mục',
       // editable: true,
       renderHeader: (params) => <strong>{'Tiêu đề'}</strong>,
+      valueFormatter: (params) => `${params.value}`,
+    },
+    {
+      field: 'name',
+      headerName: 'Tên danh mục',
+      flex: 1,
+      description: 'Tên danh mục',
+      // editable: true,
+      renderHeader: (params) => <strong>{'Tên danh mục'}</strong>,
       valueFormatter: (params) => `${params.value}`,
     },
     {
@@ -113,6 +121,7 @@ const SectionDataGrid = () => {
                     id: params.id,
                     title: params.row.title,
                     name: params.row.name,
+                    photo: params.row.photo,
                   };
                   // console.log(section);
                   dispatch(setSection(section));

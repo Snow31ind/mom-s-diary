@@ -1,20 +1,10 @@
 import { Edit, Remove, Delete } from '@mui/icons-material';
 import {
-  Box,
-  Button,
   Card,
   CardActionArea,
   CardActions,
   CardContent,
-  CardHeader,
   CardMedia,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  Link,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -30,9 +20,7 @@ import { setPost } from '../../../../features/sections/sectionsSlice';
 import { useState } from 'react';
 import { selectLoading } from '../../../../features/sections/selector';
 import {
-  closeDialog,
   createDialogState,
-  onProcessWithDialog,
   openDialog,
   setDialog,
 } from '../../../../features/dialog/dialogSlice';
@@ -46,7 +34,6 @@ const PostCard = ({ post, type, clickHandler, openPostFormModalHandler }) => {
   const [contentText, setContentText] = useState(
     post.content.slice(0, post.content.indexOf(' ', 100))
   );
-  // const [image, setImage] = useState(null);
 
   const { sectionId, content, photo, desc, name, createdAt, updatedAt, image } =
     post;

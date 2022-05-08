@@ -13,11 +13,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { ref, uploadBytes } from 'firebase/storage';
-import React, { useEffect, useRef } from 'react';
-import { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { clearPost } from '../../features/sections/sectionsSlice';
 import {
   selectLoading,
@@ -28,7 +27,6 @@ import {
 } from '../../features/sections/selector';
 import { createPost, updatePostById } from '../../thunks/sections';
 import GrowthBox from '../GrowthBox/GrowthBox';
-import defaultImage from '/images/memories.png';
 
 // action = "create" | "update" | "createWithinSection"
 const PostForm = ({ closeHandler, action }) => {
@@ -40,12 +38,16 @@ const PostForm = ({ closeHandler, action }) => {
   const section = useSelector(selectSection());
   const types = useSelector(selectSectionTypes());
 
+  const [image, setImage] = useState('');
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
     setValue,
+    setError,
+    getValues,
   } = useForm();
 
   const isEditingPost = action === 'update';
@@ -59,24 +61,72 @@ const PostForm = ({ closeHandler, action }) => {
       setValue('desc', post.desc);
       setValue('content', post.content);
       setValue('sectionId', post.sectionId);
+      setImage(post.photo);
     }
   }, [post, isEditingPost]);
 
   const submitHandler = async ({ name, desc, content, sectionId, photo }) => {
     if (isEditingPost) {
-      // console.log(photo);
-      const data = {
-        name,
-        desc,
-        content,
-        photo: photo.length ? photo[0].name : post.photo,
-        sectionId,
-      };
-      const file = photo.length ? photo[0] : null;
+      const existingPost = sections
+        .find((section) => section.id === sectionId)
+        .posts.find((post) => post.name === name);
 
-      // Update post if the post in the storage management exists.
-      dispatch(updatePostById({ file, data, id: post.id }));
-    } else if (isCreatingPostWithinSection || isCreatingPost) {
+      if (existingPost) {
+        if (
+          post.desc === desc &&
+          post.content === content &&
+          post.photo === image
+        ) {
+          return toast.error('Tên bài học nãy đã tồn tại, hãy nhập tên khác.');
+        } else {
+          const file = photo[0] || null;
+
+          const data = {
+            name,
+            desc,
+            content,
+            photo: file ? file.name : image,
+            sectionId,
+          };
+
+          // Update post if the post in the storage management exists.
+          dispatch(updatePostById({ file, data, id: post.id }));
+        }
+      } else {
+        const file = photo[0] || null;
+
+        const data = {
+          sectionId,
+          name,
+          desc,
+          content,
+          photo: file ? file.name : image,
+        };
+
+        // Update post if the post in the storage management exists.
+        dispatch(updatePostById({ file, data, id: post.id }));
+      }
+    } else {
+      if (isCreatingPostWithinSection) {
+        if (
+          sections
+            .find((section) => section.id === sectionId)
+            .posts.find((post) => post.name === name)
+        ) {
+          return toast.error('Tên bài học nãy đã tồn tại, hãy nhập tên khác.');
+        }
+      }
+
+      if (isCreatingPost) {
+        if (
+          sections
+            .find((section) => section.id === sectionId)
+            .posts.find((post) => post.name === name)
+        ) {
+          return toast.error('Tên bài học nãy đã tồn tại, hãy nhập tên khác.');
+        }
+      }
+
       // Else we would create a new post
       const data = {
         name,
@@ -126,11 +176,22 @@ const PostForm = ({ closeHandler, action }) => {
       <form onSubmit={handleSubmit(submitHandler)}>
         <List>
           {/* Section Title */}
-          <ListItem>
+          <ListItem
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+            }}
+          >
             <Controller
               name="sectionId"
               control={control}
-              defaultValue={section ? section.id : post ? post.sectionId : ''}
+              defaultValue={post ? post.sectionId : ''}
+              rules={{
+                required: true,
+                minLength: 1,
+              }}
               render={({ field }) => (
                 <FormControl fullWidth variant="filled">
                   <InputLabel id="select-type">Tiêu đề danh mục</InputLabel>
@@ -142,6 +203,7 @@ const PostForm = ({ closeHandler, action }) => {
                     }
                     labelId="select-type"
                     label="Type"
+                    error={Boolean(errors.sectionId)}
                     {...field}
                   >
                     {types.map((type) => (
@@ -153,6 +215,15 @@ const PostForm = ({ closeHandler, action }) => {
                 </FormControl>
               )}
             />
+            {errors.sectionId && (
+              <Typography
+                color="error.main"
+                variant="caption"
+                sx={{ ml: 1.5, mt: 1 }}
+              >
+                Tiêu đề danh mục không được trống
+              </Typography>
+            )}
           </ListItem>
 
           {/* Name */}
@@ -256,8 +327,35 @@ const PostForm = ({ closeHandler, action }) => {
           </ListItem>
 
           {/* Image */}
-          <ListItem>
-            <input {...register('photo')} type="file" />
+          <ListItem
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+            }}
+          >
+            <input
+              {...register('photo', {
+                ...((isCreatingPost || isCreatingPostWithinSection) && {
+                  minLength: 1,
+                  required: true,
+                }),
+              })}
+              type="file"
+              style={{ color: 'rgba(0,0,0,0)' }}
+              onChange={(e) => setImage(e.currentTarget.files[0].name)}
+            />
+            {errors.photo && (
+              <Typography
+                color="error.main"
+                variant="caption"
+                sx={{ ml: 1.5, mt: 1 }}
+              >
+                Chọn file hình ảnh cho tiêu đề
+              </Typography>
+            )}
+            {image && <Typography>{image}</Typography>}
           </ListItem>
 
           <ListItem

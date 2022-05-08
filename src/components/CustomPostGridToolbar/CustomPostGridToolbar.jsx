@@ -11,7 +11,6 @@ import React from 'react';
 
 const CustomPostGridToolbar = (createSectionHandler) => () => {
   const clickHandler = () => {
-    console.log('Clicked');
     createSectionHandler();
   };
 

@@ -63,9 +63,9 @@ const PostDataGrid = () => {
     },
     {
       field: 'sectionId',
-      headerName: 'ID danh mục',
+      headerName: 'Mã danh mục',
       flex: 1,
-      renderHeader: () => <strong>ID danh mục</strong>,
+      renderHeader: () => <strong>Mã danh mục</strong>,
     },
     {
       field: 'sectionTitle',
@@ -116,8 +116,7 @@ const PostDataGrid = () => {
       flex: 1,
       description: 'Post last update day',
       renderHeader: () => <strong>Lần cập nhật gần nhất</strong>,
-      valueFormatter: (params) =>
-        `${new Date(params.value).toLocaleDateString()}`,
+      valueFormatter: (params) => `${new Date(params.value).toLocaleString()}`,
     },
     {
       field: 'actions',
@@ -130,7 +129,18 @@ const PostDataGrid = () => {
           label="Chỉnh sửa"
           icon={<Edit />}
           onClick={() => {
-            dispatch(setPost(params.row));
+            console.log(params.row.sectionId);
+            const post = {
+              name: params.row.name,
+              desc: params.row.desc,
+              content: params.row.content,
+              sectionId: params.row.sectionId,
+              photo: params.row.photo,
+              id: params.row.id,
+            };
+
+            // console.log(post);
+            dispatch(setPost(post));
             setOpenPostForm({ status: true, action: 'update' });
           }}
         />,
@@ -166,6 +176,11 @@ const PostDataGrid = () => {
 
   const createNewPostHandler = () => {
     setOpenPostForm({ status: true, action: 'create' });
+  };
+
+  const onClosePostFormHandler = () => {
+    setOpenPostForm({ status: false, action: '' });
+    dispatch(clearPost());
   };
 
   return (
@@ -286,9 +301,7 @@ const PostDataGrid = () => {
           }}
         >
           <PostForm
-            closePostFormModalHandler={() =>
-              setOpenPostForm({ status: false, action: '' })
-            }
+            closeHandler={onClosePostFormHandler}
             action={openPostForm.action}
           />
         </Box>
