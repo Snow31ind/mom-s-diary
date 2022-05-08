@@ -82,9 +82,9 @@ const SectionForm = ({ action, closeHandler }) => {
         closeHandler();
       }
     } else if (isUpdatingSection) {
-      if (section.title === title) {
+      if (section.id === slugify(title)) {
         if (section.name === name) {
-          return toast.error('Thay đổi để cập nhật danh mục.');
+          return toast.error('Thay đổi nội dung để cập nhật danh mục.');
         } else {
           const newSection = {
             name,
@@ -92,6 +92,8 @@ const SectionForm = ({ action, closeHandler }) => {
 
           dispatch(updateSectionById({ section: newSection, id }));
         }
+      } else if (sections.find((section) => section.id === slugify(title))) {
+        return toast.error('Danh mục này đã tồn tại.');
       } else {
         const newSection = {
           title,
@@ -214,18 +216,13 @@ const SectionForm = ({ action, closeHandler }) => {
           </ListItem>
 
           {/* Image */}
-          {/* <ListItem>
+          <ListItem>
             <input
               {...register('photo')}
               type="file"
-              style={{ color: 'rgba(0,0,0,0)' }}
-              onChange={(e) => {
-                console.log(e.target.files[0].name);
-                setPhotoName(e.target.files[0].name);
-              }}
+              // style={{ color: 'rgba(0,0,0,0)' }}
             />
-            <Typography>{photoName}</Typography>
-          </ListItem> */}
+          </ListItem>
 
           {/* Submit button */}
           <ListItem
