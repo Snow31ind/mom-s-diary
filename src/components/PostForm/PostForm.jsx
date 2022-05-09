@@ -145,6 +145,7 @@ const PostForm = ({ closeHandler, action }) => {
   };
 
   const clearHandler = () => {
+    console.log('Hello');
     setValue('name', '');
     setValue('desc', '');
     setValue('content', '');
@@ -156,12 +157,23 @@ const PostForm = ({ closeHandler, action }) => {
   };
 
   const resetHandler = () => {
-    if (post) {
+    if (isCreatingPost) {
+      setValue('name', '');
+      setValue('desc', '');
+      setValue('content', '');
+      setValue('photo', '');
+      setValue('sectionId', '');
+      setImage('');
+    } else if (isEditingPost) {
       setValue('name', post.name);
       setValue('desc', post.desc);
       setValue('content', post.content);
-      // setValue('photo', post.photo);
-      setValue('sectionId', post.sectionId);
+    } else if (isCreatingPostWithinSection) {
+      setValue('name', '');
+      setValue('desc', '');
+      setValue('content', '');
+      setValue('photo', '');
+      setImage('');
     }
   };
 
@@ -364,12 +376,8 @@ const PostForm = ({ closeHandler, action }) => {
               justifyContent: 'center',
             }}
           >
-            <Button
-              variant="contained"
-              color="warning"
-              onClick={post ? resetHandler : clearHandler}
-            >
-              {isEditingPost ? 'Đặt lại' : 'Xóa'}
+            <Button variant="contained" color="warning" onClick={resetHandler}>
+              {'Đặt lại'}
             </Button>
             <GrowthBox />
             {!loading ? (

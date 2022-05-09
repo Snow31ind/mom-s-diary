@@ -16,6 +16,7 @@ import {
   selectPostBySlug,
   selectSectionTitleBySlug,
 } from '../../features/sections/selector';
+import LoadingPostDetail from '../../components/Loading/LoadingPostDetail';
 
 const PostDetail = () => {
   const dispatch = useDispatch();
@@ -25,7 +26,11 @@ const PostDetail = () => {
   const sectionTitle = useSelector(selectSectionTitleBySlug(sectionSlug));
 
   if (!post) {
-    return <div>Loading</div>;
+    return (
+      <Layout>
+        <LoadingPostDetail />
+      </Layout>
+    );
   }
 
   const publishedAt = new Date(post.createdAt).toLocaleString();

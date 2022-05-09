@@ -132,7 +132,8 @@ const SectionForm = ({ action, closeHandler }) => {
       setValue('name', '');
       setValue('desc', '');
       setValue('content', '');
-      setValue('image', '');
+      setValue('photo', '');
+      setImage('');
     } else if (isUpdatingSection) {
       setValue('title', section.title);
       setValue('name', section.name);
