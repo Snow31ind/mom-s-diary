@@ -233,6 +233,9 @@ const sectionsSlice = createSlice({
     },
     [updateSectionById.pending]: (state) => {
       state.loading = true;
+      toast.loading('Cập nhật danh mục', {
+        toastId: TOAST_LOADING,
+      });
     },
     [updateSectionById.fulfilled]: (state, action) => {
       const updatedSection = action.payload;

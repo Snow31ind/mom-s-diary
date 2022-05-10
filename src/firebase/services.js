@@ -219,7 +219,7 @@ export const updateSection = async (id, section, file) => {
       );
     }
 
-    const updatedSection = fetchSectionById(newSectionId);
+    const updatedSection = await fetchSectionById(newSectionId);
 
     return updatedSection;
   } catch (error) {
